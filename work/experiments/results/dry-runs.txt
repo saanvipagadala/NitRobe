@@ -1,0 +1,55 @@
+
+exp-1  dry run: gene-present-not-working
+  Which of the shortlisted species actually destroy nitrous oxide?
+  DRY RUN on invented numbers. Not evidence of anything.
+
+  positive control cleared 95% of the N₂O, negative control 1%
+  YES  the method can tell a carrier from a non-carrier, so the rest can be read
+  shortlisted species that cleared the N₂O: 0 of 12
+  NO   the gene is present and the N₂O stays. The gene finder found DNA rather than ability, and the write-up has to say that
+
+exp-1  dry run: method-broken
+  Which of the shortlisted species actually destroy nitrous oxide?
+  DRY RUN on invented numbers. Not evidence of anything.
+
+  positive control cleared 3% of the N₂O, negative control 6%
+  NO   the positive control did nothing, so the method is wrong and no strain can be judged. Fix the vials first
+
+exp-1  dry run: several-work
+  Which of the shortlisted species actually destroy nitrous oxide?
+  DRY RUN on invented numbers. Not evidence of anything.
+
+  positive control cleared 95% of the N₂O, negative control 3%
+  YES  the method can tell a carrier from a non-carrier, so the rest can be read
+  shortlisted species that cleared the N₂O: 5 of 12
+  YES  the project may need to build nothing at all: B. guangdongense, B. nanningense, B. neotropicale, B. stylosanthis, B. centrolobii
+
+exp-2  dry run: build-lost-the-race
+  Does the built strain destroy N₂O, and does it still win the race into the roots?
+  DRY RUN on invented numbers. Not evidence of anything.
+
+  N₂O cleared: the host 5%, NitRobe 90%, nosZ alone 46%
+  nodules taken: the host 62%, NitRobe 9%
+  YES  NitRobe destroys N₂O and the host does not, so the genes work in it
+  NO   NitRobe lost the race, so it is now just another strain that cannot compete. The invention fails on its central claim
+  YES  the whole set was needed, which is why these genes travel together
+
+exp-2  dry run: build-works
+  Does the built strain destroy N₂O, and does it still win the race into the roots?
+  DRY RUN on invented numbers. Not evidence of anything.
+
+  N₂O cleared: the host 6%, NitRobe 90%, nosZ alone 46%
+  nodules taken: the host 64%, NitRobe 65%
+  YES  NitRobe destroys N₂O and the host does not, so the genes work in it
+  YES  NitRobe still wins the race into the roots, which is the whole invention
+  YES  the whole set was needed, which is why these genes travel together
+
+exp-2  dry run: nosz-alone-is-enough
+  Does the built strain destroy N₂O, and does it still win the race into the roots?
+  DRY RUN on invented numbers. Not evidence of anything.
+
+  N₂O cleared: the host 6%, NitRobe 90%, nosZ alone 88%
+  nodules taken: the host 51%, NitRobe 49%
+  YES  NitRobe destroys N₂O and the host does not, so the genes work in it
+  YES  NitRobe still wins the race into the roots, which is the whole invention
+  YES  the main gene did as well on its own as the whole set, so the build can be simplified

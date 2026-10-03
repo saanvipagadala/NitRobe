@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dry run: build-works &middot; exp-2</title>
+<link rel="icon" href="../../../../../nitrobe.svg">
+<style>
+:root { --bg:#FBFAF7; --surface:#fff; --ink:#1B1A17; --ink-2:#4A4740;
+        --ink-3:#7C776C; --rule:#E2DDD1; --good:#1C6B4A; --bad:#A33A2A;
+        --warn:#B5651D; }
+@media (prefers-color-scheme:dark) { :root:not([data-theme="light"]) {
+  --bg:#14161A; --surface:#1B1E24; --ink:#F2EFE8; --ink-2:#BFBAAF;
+  --ink-3:#8B867B; --rule:#2E333C; --good:#3E9E71; --bad:#E0705C;
+  --warn:#E9A23C; } }
+:root[data-theme="dark"] { --bg:#14161A; --surface:#1B1E24; --ink:#F2EFE8;
+  --ink-2:#BFBAAF; --ink-3:#8B867B; --rule:#2E333C; --good:#3E9E71;
+  --bad:#E0705C; --warn:#E9A23C; }
+* { box-sizing:border-box }
+body { margin:0; background:var(--bg); color:var(--ink);
+       font:16px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif }
+.wrap { max-width:56rem; margin:0 auto; padding:36px clamp(20px,4vw,48px) 88px }
+header { border-bottom:2px solid var(--ink); padding-bottom:20px }
+.eyebrow { font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+           color:var(--ink-3); font-weight:650; margin:0 0 8px;
+           display:flex; align-items:center; gap:8px }
+.eyebrow .mark { width:30px; height:20px }
+h1 { font-size:clamp(26px,3.4vw,40px); line-height:1.15; margin:0 0 10px;
+     letter-spacing:-.02em }
+.sub { color:var(--ink-2); margin:0; font-size:17px }
+.stamp { color:var(--ink-3); font-size:13px; margin-top:14px }
+h2 { font-size:23px; margin:48px 0 6px; letter-spacing:-.01em }
+h2 + .lede { color:var(--ink-2); margin:0 0 18px }
+.banner { border-left:3px solid var(--warn); padding:2px 0 2px 14px;
+          margin:22px 0 0; color:var(--ink-2); font-size:15px }
+.banner b { color:var(--warn) }
+.banner span { display:block; margin-top:3px; color:var(--ink-3) }
+.cards { display:grid; gap:16px; margin:18px 0 0;
+         grid-template-columns:repeat(auto-fit,minmax(290px,1fr)) }
+.card { background:var(--surface); border:1px solid var(--rule);
+        border-radius:12px; padding:18px 20px; border-top:4px solid var(--ink-3) }
+.card.yes { border-top-color:var(--good) } .card.no { border-top-color:var(--bad) }
+.card .call { font-size:15px; font-weight:680; letter-spacing:.06em;
+              text-transform:uppercase; margin:0 0 6px }
+.card.yes .call { color:var(--good) } .card.no .call { color:var(--bad) }
+.card p { margin:0; font-size:15px; color:var(--ink-2) }
+.facts { list-style:none; padding:0; margin:0 }
+.facts li { border-bottom:1px solid var(--rule); padding:10px 0;
+            color:var(--ink-2) }
+table { border-collapse:collapse; width:100%; font-size:14.5px }
+th,td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--rule) }
+th { font-size:12px; letter-spacing:.05em; text-transform:uppercase;
+     color:var(--ink-3) }
+figure { margin:18px 0 0 }
+figcaption { color:var(--ink-3); font-size:13px; margin-top:10px }
+.chart { width:100%; height:auto; display:block;
+         --cleared:#2A6B4A; --stayed:#A8761C; --ref:#7C776C }
+@media (prefers-color-scheme:dark) { :root:not([data-theme="light"]) .chart {
+  --cleared:#3E9E71; --stayed:#B3842A; --ref:#8B867B } }
+:root[data-theme="dark"] .chart { --cleared:#3E9E71; --stayed:#B3842A;
+  --ref:#8B867B }
+.chart .grid { stroke:var(--rule); stroke-width:1 }
+.chart .axis { fill:var(--ink-3); font-size:12px }
+.chart .lbl  { fill:var(--ink-2); font-size:12.5px }
+.chart path { fill:none; stroke-width:2; stroke-linecap:round;
+              stroke-linejoin:round }
+.chart .s-cleared { stroke:var(--cleared) }
+.chart .s-stayed  { stroke:var(--stayed) }
+.chart .s-ref     { stroke:var(--ref); stroke-dasharray:5 4 }
+.chart .thick { stroke-width:3.5 }
+.key { display:flex; flex-wrap:wrap; gap:16px; margin:12px 0 0; padding:0;
+       list-style:none; font-size:13.5px; color:var(--ink-2) }
+.key li { display:flex; align-items:center; gap:7px }
+.key i { width:18px; height:0; border-top-width:3px; border-top-style:solid;
+         display:inline-block }
+.end { color:var(--ink-3); font-size:13px; margin-top:52px;
+       border-top:1px solid var(--rule); padding-top:14px }
+a { color:inherit }
+</style></head><body><div class="wrap">
+<header>
+  <p class="eyebrow"><img src="../../../../../nitrobe.svg" alt="" class="mark">
+     NitRobe &middot; 3M Young Scientist Challenge 2027 &middot; exp-2</p>
+  <h1>Does the built strain destroy N₂O, and does it still win the race into the roots?</h1>
+  <p class="sub">A dry run on invented numbers, to check that the analysis tells the truth.</p>
+  <p class="stamp">Written by report.py on 2026-10-02 &middot;
+     <a href="../../../../../experiments/exp-2.html">the run sheet</a></p>
+</header>
+<div class="banner"><b>A dry run.</b> The numbers below were invented, to check that the analysis reads them correctly.<span>The built strain destroys N₂O and still wins the race.</span></div>
+
+<h2>What the numbers show</h2>
+<p class="lede">Every answer below was decided by a rule written down
+<em>before</em> any data existed, so a disappointing answer counts exactly as
+much as a good one.</p>
+<div class="cards"><div class="card yes"><p class="call">Yes</p><p>NitRobe destroys N₂O and the host does not, so the genes work in it</p></div><div class="card yes"><p class="call">Yes</p><p>NitRobe still wins the race into the roots, which is the whole invention</p></div><div class="card yes"><p class="call">Yes</p><p>the whole set was needed, which is why these genes travel together</p></div></div>
+
+<h2>The N₂O, over 4 days</h2>
+<figure>
+<svg class="chart" viewBox="0 0 760 330" role="img"
+     aria-label="Nitrous oxide left in each vial over 96 hours.">
+<line class="grid" x1="52" x2="610" y1="286.0" y2="286.0"/><text class="axis" x="44" y="290.0" text-anchor="end">0</text><line class="grid" x1="52" x2="610" y1="151.0" y2="151.0"/><text class="axis" x="44" y="155.0" text-anchor="end">57</text><line class="grid" x1="52" x2="610" y1="16.0" y2="16.0"/><text class="axis" x="44" y="20.0" text-anchor="end">113</text><path class="s-ref thick" d="M52.0,44.9 L191.5,43.6 L331.0,49.1 L470.5,56.0 L610.0,60.1"/><path class="s-cleared" d="M52.0,48.3 L191.5,65.0 L331.0,103.4 L470.5,153.6 L610.0,261.3"/><path class="s-cleared" d="M52.0,48.1 L191.5,47.8 L331.0,78.0 L470.5,99.5 L610.0,158.5"/><path class="s-ref" d="M52.0,40.5 L191.5,67.3 L331.0,99.6 L470.5,158.4 L610.0,267.1"/><text class="lbl" x="618.0" y="64.1">E109, the host</text><text class="lbl" x="618.0" y="271.1">USDA 110, the donor</text><text class="axis" x="52.0" y="308" text-anchor="middle">start</text><text class="axis" x="191.5" y="308" text-anchor="middle">6h</text><text class="axis" x="331.0" y="308" text-anchor="middle">1 day</text><text class="axis" x="470.5" y="308" text-anchor="middle">2 days</text><text class="axis" x="610.0" y="308" text-anchor="middle">4 days</text>
+</svg>
+<ul class="key">
+<li><i style="border-color:var(--cleared)"></i>cleared the N₂O</li>
+<li><i style="border-color:var(--stayed)"></i>N₂O stayed</li>
+<li><i style="border-color:var(--ref)"></i>controls, named on the right</li>
+</ul>
+<figcaption>Nitrous oxide left above the liquid, in ppm, timed from the moment
+the vial was sealed. Each line is the average of that group's 3 vials. A line
+that falls is a strain destroying N₂O.</figcaption>
+</figure>
+
+<h2>The numbers behind it</h2>
+<ul class="facts"><li>N₂O cleared: the host 6%, NitRobe 90%, nosZ alone 46%</li><li>nodules taken: the host 64%, NitRobe 65%</li></ul>
+
+<h2>Every group</h2>
+<p class="lede">What each one cleared in the vials by 96 hours, what share of the nodules it took in the pots, and what the rules called it.</p>
+<table><thead><tr><th>No.</th><th>Strain</th><th>N₂O cleared</th><th>Nodules taken</th><th>The call</th></tr></thead><tbody><tr><td>1</td><td>E109, the host</td><td>6%</td><td>64%</td><td>control</td></tr><tr><td>2</td><td>NitRobe</td><td>90%</td><td>65%</td><td>destroys it</td></tr><tr><td>3</td><td>E109 + nosZ alone</td><td>46%</td><td>58%</td><td>destroys it</td></tr><tr><td>4</td><td>USDA 110, the donor</td><td>92%</td><td>34%</td><td>control</td></tr></tbody></table>
+
+<div class="end">end of report</div>
+</div></body></html>

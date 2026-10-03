@@ -1,0 +1,9 @@
+scenario,carbon,nitrate,oxygen,without_gene,with_gene,percent_faster
+Inside a root nodule,1000,10,0,1.2,1.884,57.1
+Soil touching a root,100,10,0,1.2,1.884,57.1
+"A flooded, heavily fertilized field",10,1000,0,1.61,2.008,24.7
+"A flooded field, normal fertilizer",10,100,0,1.61,2.008,24.7
+Open soil between the plants,5,100,0,0.805,1.004,24.7
+"Poor sandy soil, little of anything",5,5,0,0.6,0.942,57.1
+"Soil draining after rain, some air returning",10,100,5,1.862,2.129,14.4
+"Well-drained soil, plenty of air",10,100,50,2.377,2.377,0.0

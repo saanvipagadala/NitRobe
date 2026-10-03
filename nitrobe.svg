@@ -1,0 +1,20 @@
+<!-- The same creature as the MarsWorm mark, in this project's own colour.
+
+     MarsWorm's microbe is gold, for a bacterium built to live on Mars. This
+     one is green, for a bacterium already living in a soybean root here.
+
+     The viewBox is the original's. Do not tighten it by eye: the body ellipse
+     has ry="10" and the flagellum curves out to x=25, so a smaller box clips
+     the creature.
+
+     NOTE: no double hyphen anywhere in this comment. A double hyphen is
+     illegal inside an XML comment and makes the whole file fail to parse,
+     which shows up as a logo that has silently vanished. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -19 46 30" width="230" height="150">
+  <ellipse rx="12.5" ry="10" fill="#4fa46c"/>
+  <path d="M 12 3 C 18 6 20 -1 25 1" fill="none" stroke="#4fa46c" stroke-width="2" stroke-linecap="round"/>
+  <path d="M -9 -7 L -14 -12" stroke="#4fa46c" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M -2 -10 L -4 -16" stroke="#4fa46c" stroke-width="1.8" stroke-linecap="round"/>
+  <circle cx="-3.5" cy="-1.5" r="1.7" fill="#0e1016"/>
+  <circle cx="3.5" cy="-1.5" r="1.7" fill="#0e1016"/>
+</svg>

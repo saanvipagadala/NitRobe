@@ -1,0 +1,949 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Experiment 1: find the N₂O destroyer</title>
+<meta name="description" content="A soil microbe engineered to destroy nitrous oxide, the 3rd worst greenhouse gas. 70% of it comes off farm soil.">
+<link rel="canonical" href="https://saanvipagadala.github.io/NitRobe/experiments/exp-1.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NitRobe">
+<meta property="og:title" content="NitRobe">
+<meta property="og:description" content="A soil microbe engineered to destroy nitrous oxide, the 3rd worst greenhouse gas. 70% of it comes off farm soil.">
+<meta property="og:url" content="https://saanvipagadala.github.io/NitRobe/experiments/exp-1.html">
+<meta property="og:image" content="https://saanvipagadala.github.io/NitRobe/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="NitRobe, a soil microbe engineered to destroy a greenhouse gas">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="NitRobe">
+<meta name="twitter:description" content="A soil microbe engineered to destroy nitrous oxide, the 3rd worst greenhouse gas. 70% of it comes off farm soil.">
+<meta name="twitter:image" content="https://saanvipagadala.github.io/NitRobe/og-image.png">
+<meta name="theme-color" content="#4fa46c">
+<link rel="icon" type="image/svg+xml" href="../nitrobe.svg">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="stylesheet" href="../site.css">
+<style>
+  /* The bar across the top. The mark's own green at about 4% over the page:
+     enough that the bar reads as its own surface when the text scrolls under
+     it, not enough to compete with anything on the page. MarsWorm does the
+     same thing with its rust. */
+  :root { --bar: #f6f9f5; --bar-rule: #dde8dc; }
+  body { background: var(--bg); }
+  main { margin: 0; padding: 1.4rem 0 0; }
+  /* The header, in the shape the public MarsWorm pages use: sticky, the mark
+     on the left, and the page it is on underlined in the accent. The links
+     stay centred, which is where this site has always had them. */
+  h1 { margin-bottom: 1rem; }
+  h2 { margin-top: 2.2rem; font-size: 1.32rem; }
+  /* Anything a fragment can land on has to clear the sticky bar, or the
+     thing being linked to sits behind it. The vendored stylesheet does
+     this for headings; folds and figures need it too, and an h2 rule
+     here would otherwise override the vendored one. */
+  main [id], main details, main summary {
+    scroll-margin-top: calc(var(--nav-h) + 1.4rem); }
+  h3 { font-size: 1.1rem; }
+  hr { border: 0; border-top: 1px solid var(--rule); margin: 2.4rem 0 0; }
+  hr + h2 { margin-top: 1.9rem; }
+
+  /* The link that hands a line of writing off to a longer page. Set the way
+     the gene finder sets "See how it was built": the accent, no extra
+     weight, a hairline of the accent under it, and the size of a note
+     rather than of the prose around it. 0.8rem is 14.4px here, which is
+     that 14.5px. */
+  a.more { font-size: .8rem; font-weight: 400;
+           border-bottom-color: rgba(179, 64, 31, .35); }
+  a.more:hover { color: var(--ink);
+                 border-bottom-color: rgba(26, 26, 26, .4); }
+
+  .tablewrap { overflow-x: auto; }
+  .tablewrap > table { width: 100%; margin: 1.2rem 0 1.6rem; }
+  table { font-size: .88rem; }
+  th { font-family: var(--sans); font-size: .74rem; letter-spacing: .04em;
+       text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+
+  /* The caveats. Every one of these is somewhere the project admits a limit,
+     so they are set apart rather than buried in a paragraph. */
+  blockquote { border-left: 3px solid var(--accent); padding: .1rem 0 .1rem 1.1rem;
+               margin: 1.4rem 0; color: var(--ink); }
+  blockquote h3 { margin: .3rem 0; font-size: 1.28rem; color: var(--accent-2);
+                  border: 0; padding: 0; }
+
+  /* The experiments index, matching labs.html on the public site. The title
+     is a plain link, what the experiment involves sits under it in the same
+     size, and the paperwork links keep to one line so the rows line up. */
+  .labs td:first-child { white-space: nowrap; width: 1%; }
+  .labs td:last-child { white-space: nowrap; }
+  /* The paperwork links are a footnote to the row, not part of it, so they
+     are set at the size the finder uses for the same kind of link. 0.8rem is
+     14.4px here, which is that 14.5px. */
+  .labs td:last-child { font-size: .8rem; }
+  .labs td:last-child a { display: inline-block; }
+  .labs td:last-child a + a { margin-left: .7rem; }
+  .labs .ask { display: block; color: var(--ink-2); margin-top: .15rem; }
+
+  img { max-width: 100%; height: auto; background: #fff;
+        border: 1px solid var(--rule-2); border-radius: 3px; margin: 1rem 0; }
+  /* The drawings, presented the way the public MarsWorm pages present
+     theirs. They are transparent on purpose, so they take the colour of the
+     page: a white box and a border behind one shows as a pale block. */
+  .fig { margin: 2rem auto; }
+  .fig img { display: block; max-width: 100%; height: auto; margin: 0 auto;
+             background: none; border: 0; }
+  .fig figcaption { margin: .6rem auto 0; max-width: 40rem; text-align: center;
+                    font-family: var(--sans); font-size: .78rem;
+                    line-height: 1.5; color: var(--ink-3); }
+  /* A drawing squeezed into the text column is a picture of some writing
+     rather than writing. So it keeps its size and the figure scrolls
+     sideways, which is what the tables on this site already do. */
+  /* A drawing is allowed past the text measure, because an experiment
+     squeezed into 44rem stops being readable. */
+  /* Only once the window itself is narrower than the drawing does the figure
+     scroll instead of shrinking past the point of being read, which is what
+     the tables on this site already do. */
+  @media (max-width: 62rem) {
+    .fig.wide { overflow-x: auto; }
+    .fig.wide img { min-width: 900px; }
+  }
+  /* The caption lives inside the box that scrolls, so centring it on a narrow
+     screen would centre it against the drawing's full width and push it out
+     of sight. Pinned to the left of the scrollport, it stays visible. */
+  @media (max-width: 62rem) {
+    .fig.wide figcaption { position: sticky; left: 0;
+                           width: min(40rem, 92vw); margin: .6rem 0 0; }
+  }
+  small { color: var(--ink-3); }
+
+  /* The folds. site.css styles these under .page, which this site does not
+     use, so the same look is set out here: a quiet offer with a rule down its
+     left side and a triangle that turns when it opens. */
+  main > details { margin: .5rem auto 1.1rem;
+                   border-left: 2px solid var(--rule); padding-top: .1rem; }
+  main > details > summary { cursor: pointer; list-style: none;
+                             font-family: var(--sans); font-size: .92rem;
+                             font-weight: 600; color: var(--ink-2);
+                             padding: .35rem 0 .35rem 1.2rem;
+                             margin-left: -1.2rem; }
+  main > details > summary::-webkit-details-marker { display: none; }
+  main > details > summary::before { content: "▸"; display: inline-block;
+                                     width: 1rem; color: var(--accent);
+                                     transition: transform .15s; }
+  main > details[open] > summary::before { transform: rotate(90deg); }
+  main > details > summary:hover { color: var(--accent); }
+
+  /* An open fold is an answer being read, and the page around it is a list of
+     questions being scanned. So it stops looking like the list: it sits on
+     its own tint, its rule turns the accent colour, and the type comes up a
+     touch with more air between the lines. */
+  main > details[open] { background: var(--bg-2);
+                         border-left-color: var(--accent);
+                         border-radius: 0 3px 3px 0;
+                         margin-bottom: 1.6rem; padding-bottom: .4rem; }
+  main > details[open] > summary { color: var(--ink);
+                                   border-bottom: 1px solid var(--rule);
+                                   margin-bottom: .5rem; }
+  main > details[open] > *:not(summary) { font-size: 1.02rem;
+                                          line-height: 1.72; }
+  /* The padding on the fold's own children replaces what main > * gives to
+     everything else, so text inside a fold lines up with text outside it. */
+  main > details > *:not(summary) { padding-left: 1.2rem; }
+  main > details[open] > *:not(summary) { padding-right: 1.2rem; }
+  /* A call-out inside an open fold. Outside a fold it stands out by sitting
+     on a tint; inside one the fold is already tinted, so the tint would
+     vanish. It stands on the page's own background instead, which is the
+     lighter of the 2, and keeps its accent rule. */
+  main > details[open] blockquote { background: var(--bg);
+                                    border-left-width: 3px;
+                                    border-radius: 0 3px 3px 0;
+                                    padding: .55rem 1rem .55rem 1.1rem;
+                                    margin: 1.2rem 0; }
+
+  /* Last, on purpose. Main spans the window and every child is held to the
+     text measure, which is what lets a drawing sit wider than the text
+     without a scrollbar. It comes after the rules above because several of
+     them set a side margin of 0, and a rule or a quote pushed to the window
+     edge is what that looked like. */
+  main > * { max-width: var(--col); margin-left: auto; margin-right: auto;
+             padding-left: clamp(1rem, 5vw, 1.1rem);
+             padding-right: clamp(1rem, 5vw, 1.1rem); }
+  /* A plain figure keeps to the text column. Only a wide one is
+     allowed past it, which is how the public pages split them. */
+  /* The footer is 2 short lines, so it is set as 2 short lines: half the gap
+     above it, tighter padding, and the 2 lines closer together than ordinary
+     paragraphs. The fullscreen button keeps the corner it has on the public
+     pages, 1.1rem in from the edges. */
+  .foot { margin-top: 2.2rem; padding-top: .9rem; padding-bottom: .9rem; }
+  .foot p { margin-bottom: .15rem; }
+  .foot .who { margin-bottom: 0; }
+
+  main > figure { max-width: var(--col); }
+  main > figure.wide { max-width: 62rem; }
+  main > .tablewrap { max-width: var(--col); }
+  /* site.css holds the hero to 40rem, and on the public pages a
+     class-level rule widens it back to the column. Same here, or
+     the portrait sits indented from the heading above it. */
+  main > .hero { max-width: var(--col); }
+</style></head><body>
+<!-- The bar across the top of every page, and the footer under it.
+
+     This is 1 file because the site is built 2 different ways. The writing is
+     markdown run through pandoc; the gene finder is a standalone page built by
+     work/dna_model/export_browser.py and copied in whole. Those 2 used to
+     carry their own copies of the bar, and the copies drifted: different
+     widths, different text sizes, a bar that slid sideways on a page with 1
+     more link in it.
+
+     Everything here is in pixels on purpose. site.css sets html to 18px and
+     the finder runs at 16px, so the same rem value means 2 different sizes.
+     Pixels are the only units that mean the same thing on both.
+
+     build_site.py reads this file, fills in the 2 placeholders below, and
+     puts it on both kinds of page. The placeholder names are deliberately not
+     repeated in this comment: the fill-in is a plain string replace, so a
+     placeholder written here would be replaced here too, and a bar full of
+     links would end up inside an HTML comment. -->
+<style>
+.sitebar { position: sticky; top: 0; z-index: 50;
+  background: #f6f9f5; border-bottom: 1px solid #dde8dc; }
+/* The same width as the text column, and the same padding, so the mark starts
+   exactly where the writing starts. Sized by the column rather than by its own
+   contents, or the whole group shifts when a page has an extra link. */
+.sitebar .inner { display: flex; align-items: center; gap: 11px 29px;
+  width: 792px; max-width: 100%; margin: 0 auto;
+  padding: 11px clamp(18px, 5vw, 0px); }
+.sitebar .brand { display: flex; align-items: center; gap: 9px;
+  color: #1a1a1a; text-decoration: none; border: 0; }
+.sitebar .brand img { width: 82px; height: 60px; background: none; border: 0;
+  margin: 0; }
+.sitebar .brand b { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 19px; line-height: 1.15; letter-spacing: -.01em; }
+.sitebar .links { display: flex; flex-wrap: wrap; gap: 6px 20px; }
+.sitebar .links a { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 15px; letter-spacing: .01em; color: #6b6b6b;
+  text-decoration: none; border: 0; padding: 3px 0; white-space: nowrap; }
+.sitebar .links a:hover { color: #b3401f; }
+.sitebar .links .sep { color: #e2ddd9; user-select: none; }
+.sitebar .links a.tool { color: #b3401f; font-weight: 600; }
+.sitebar .links a.here { color: #1a1a1a; font-weight: 600;
+  border-bottom: 2px solid #b3401f; }
+@media (max-width: 830px) { .sitebar .brand img { width: 44px; height: 29px; } }
+
+/* The same numbers the MarsWorm site uses: 0.9rem of padding top and bottom
+   rather than 1.4 and 3, and the 2 lines close together. The old values left
+   a hand's width of nothing under the writing. */
+.sitefoot { margin-top: 40px; padding: 16px clamp(18px, 5vw, 54px);
+  border-top: 1px solid #e6dbd4; text-align: center; }
+.sitefoot p { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: 0 auto 3px; font-size: 13px; color: #877060; letter-spacing: .01em;
+  line-height: 1.4; }
+.sitefoot p:last-child { margin-bottom: 0; }
+.sitefoot b { color: #877060; font-weight: 700; }
+</style>
+<nav class="sitebar"><div class="inner">
+<a class="brand" href="../index.html"><img src="../nitrobe.svg" alt="">
+<span class="wordmark"><b>NitRobe</b></span></a>
+<div class="links"><a class="" href="../index.html">Overview</a><a class="" href="../end-to-end.html">The full story</a><a class="" href="../experiments/index.html">Experiments</a><span class="sep" aria-hidden="true">|</span><a class="tool" href="../finder/index.html">Try the gene finder</a></div></div></nav>
+
+<main class="">
+<h1 id="experiment-1-find-the-n₂o-destroyer">Experiment 1: find the N₂O
+destroyer</h1>
+<p><a href="../finder/index.html">The search</a> read 40 genomes and
+found <a href="#the-strains">13 species</a> carrying the gene. <strong>A
+gene being present is not the same as a gene working.</strong> This
+experiment is where the bench agrees with the gene finder or does
+not.</p>
+<p>It is the cheapest experiment in the project, so it goes first. If
+one of them destroys N₂O and can also beat the bacteria already in the
+soil to the roots, nothing needs to be built at all. The answer is
+simply to change which strain goes in the bag.</p>
+<figure class="fig wide"><img src="../work/experiments/results/diagrams/exp-1.png" alt="The setup for experiment 1"><figcaption><b>The whole set-up, on day 1.</b> Every vial gets the same food, the same dose of N₂O and the same seal. The only thing that differs is what went into the liquid, which is the only thing this experiment changes. The cap covers a rubber septum, so a syringe can take a sample 5 times without ever opening the vial.</figcaption></figure>
+<h2 id="in-short">In short</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>The experiment</th>
+<th>In 1 line</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>What we do</strong></td>
+<td>Seal each strain into a vial of liquid food with no air above it,
+inject the same dose of nitrous oxide into that space, and keep the
+vials at 28 degrees Celsius</td>
+</tr>
+<tr>
+<td><strong>What we measure</strong></td>
+<td>How much of the N₂O is left, on a gas chromatograph, at the start,
+then 6 hours, 1 day, 2 days and 4 days</td>
+</tr>
+<tr>
+<td><strong>What it tells us</strong></td>
+<td>Which shortlisted species actually destroy N₂O, rather than just
+carrying the gene for it</td>
+</tr>
+<tr>
+<td><strong>How long it takes</strong></td>
+<td>3 weeks, once the strains are in hand. Only 4 days of that is the
+measurement</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="what-is-in-a-vial">What is in a vial</h2>
+<p>Each vial holds 10 mL of growth medium, which is water with mineral
+salts and something for the bacteria to eat, all from one batch so no
+vial is better fed than another. The bacteria live in that liquid. Above
+it is a sealed space of gas called the headspace, and that is where the
+nitrous oxide is injected and where it is measured.</p>
+<p><strong>The air is flushed out before sealing.</strong> With no
+oxygen to breathe, a bacterium that has the enzyme turns to the nitrous
+oxide instead, which is the whole thing being watched.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Group</th>
+<th>What is in it</th>
+<th>Why it is here</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><em>B. diazoefficiens</em> USDA 110</td>
+<td><strong>The positive control.</strong> Known to destroy N₂O. If this
+one does nothing, the experiment is broken rather than the strain</td>
+</tr>
+<tr>
+<td>2</td>
+<td><em>B. japonicum</em> CPAC 15</td>
+<td><strong>The negative control.</strong> Known to lack the gene.
+Nothing should happen</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Sterile medium, no bacteria</td>
+<td>Shows the N₂O does not simply leak out of the vial</td>
+</tr>
+<tr>
+<td>4 to 15</td>
+<td>1 per shortlisted species</td>
+<td>The actual question</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>3 vials of each, so no single lucky vial decides
+anything.</strong> The gene finder shortlisted 13 species, and 1 of them
+is USDA 110 itself, which already goes in as the positive control. That
+leaves 12 to test. 12 candidates plus 3 controls is 15 groups, and 15
+times 3 is <strong>45 vials</strong>. Each one is read 5 times, which is
+225 readings on the gas chromatograph.</p>
+<p><strong>USDA 110 turning up on the shortlist is a check on the gene
+finder</strong>, not a 14th candidate. It is the strain already known to
+destroy N₂O, and the gene finder picked it out of 40 genomes without
+being told.</p>
+<p>Groups 2 and 3 are what make this an experiment rather than a
+demonstration. Group 2 shows the method can tell a carrier from a
+non-carrier. Group 3 shows that N₂O disappearing means it was destroyed,
+rather than that it escaped.</p>
+<details>
+<summary>The strains that go in the vials</summary>
+<span id="the-strains"></span>
+
+<p>The search gave every genome a score between 0 and 1. These 13 scored
+high.</p>
+<p>CPAC 15 is the 14th, and it is here on purpose. It scored 0.287, far
+below the rest. If the vials show it destroying N₂O too, the test is
+wrong.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Species</th>
+<th>Score</th>
+<th>Genome</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><em>Bradyrhizobium guangdongense</em></td>
+<td>0.997</td>
+<td><code>GCA_002128415</code></td>
+<td></td>
+</tr>
+<tr>
+<td>2</td>
+<td><em>Bradyrhizobium forestalis</em></td>
+<td>0.996</td>
+<td><code>GCA_002795245</code></td>
+<td></td>
+</tr>
+<tr>
+<td>3</td>
+<td><em>Bradyrhizobium nanningense</em></td>
+<td>0.996</td>
+<td><code>GCA_004114535</code></td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td><em>Bradyrhizobium nitroreducens</em></td>
+<td>0.996</td>
+<td><code>GCA_002776695</code></td>
+<td></td>
+</tr>
+<tr>
+<td>5</td>
+<td><em>Bradyrhizobium frederickii</em></td>
+<td>0.995</td>
+<td><code>GCA_004570865</code></td>
+<td></td>
+</tr>
+<tr>
+<td>6</td>
+<td><em>Bradyrhizobium neotropicale</em></td>
+<td>0.995</td>
+<td><code>GCA_001641695</code></td>
+<td></td>
+</tr>
+<tr>
+<td>7</td>
+<td><em>Bradyrhizobium diazoefficiens</em> USDA 110</td>
+<td>0.995</td>
+<td><code>GCA_000011365</code></td>
+<td><strong>The positive control.</strong> The search picked it out
+without being told</td>
+</tr>
+<tr>
+<td>8</td>
+<td><em>Bradyrhizobium ottawaense</em></td>
+<td>0.995</td>
+<td><code>GCA_002278135</code></td>
+<td></td>
+</tr>
+<tr>
+<td>9</td>
+<td><em>Bradyrhizobium shewense</em></td>
+<td>0.994</td>
+<td><code>GCA_900094605</code></td>
+<td></td>
+</tr>
+<tr>
+<td>10</td>
+<td><em>Bradyrhizobium stylosanthis</em></td>
+<td>0.994</td>
+<td><code>GCA_001641335</code></td>
+<td></td>
+</tr>
+<tr>
+<td>11</td>
+<td><em>Bradyrhizobium oligotrophicum</em> S58</td>
+<td>0.993</td>
+<td><code>GCA_000344805</code></td>
+<td></td>
+</tr>
+<tr>
+<td>12</td>
+<td><em>Bradyrhizobium lablabi</em></td>
+<td>0.992</td>
+<td><code>GCA_001440475</code></td>
+<td></td>
+</tr>
+<tr>
+<td>13</td>
+<td><em>Bradyrhizobium centrolobii</em></td>
+<td>0.990</td>
+<td><code>GCA_001641635</code></td>
+<td></td>
+</tr>
+<tr>
+<td>14</td>
+<td><em>Bradyrhizobium japonicum</em> CPAC 15</td>
+<td>0.287</td>
+<td><code>GCA_000661935</code></td>
+<td><strong>The negative control.</strong> Scored below the line, so
+nothing should happen</td>
+</tr>
+</tbody>
+</table></div>
+<p>Every accession is a genome anybody can download and run through the
+finder.</p>
+</details>
+
+<h2 id="why-3-weeks-for-a-4-day-measurement">Why 3 weeks for a 4 day
+measurement</h2>
+<p><strong>The bacteria are the slow part.</strong>
+<em>Bradyrhizobium</em> is a slow grower by definition. It takes 6 to 8
+days to make a visible colony on a plate, and another 3 to 5 days to
+cloud up a tube of liquid. A common gut bacterium doubles every 20
+minutes. These double every 6 to 48 hours.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>What happens</th>
+<th>How long</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Revive the cultures and streak them out</td>
+<td>about a week</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Grow all 14 strains in liquid to the same cloudiness</td>
+<td>about a week</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Fill, flush, seal and inject 45 vials</td>
+<td>a day</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>The experiment.</strong> 5 readings over 96 hours</td>
+<td>4 days</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>None of that counts getting the strains.</strong> The request
+to a culture collection, and shipping, happens before the clock starts
+and can take months.</p>
+<h2 id="getting-hold-of-the-strains">Getting hold of the strains</h2>
+<p>The <a
+href="https://www.ars.usda.gov/northeast-area/beltsville-md-barc/beltsville-agricultural-research-center/national-germplasm-resources-laboratory/docs/business/">USDA
+National Rhizobium Germplasm Resource Collection</a> at Beltsville holds
+more than 5,000 rhizobia and sends cultures out free. That is where the
+request goes first.</p>
+<p><strong>Some of the 12 may not arrive.</strong> Several were first
+described in China and Brazil, and their type strains may sit only in
+collections that need international shipping and an import permit. So
+the shortlist is what gets asked for, not what gets tested. The write-up
+names which species arrived and which could not be obtained, and the
+experiment works with however many turn up. The 2 controls are both
+common soybean strains, and they are what make it an experiment.</p>
+<h2 id="what-each-outcome-means">What each outcome means</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>If</th>
+<th>Then</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Several species clear the N₂O as fast as USDA 110</td>
+<td><strong>Nothing needs engineering.</strong> Change which strain goes
+in the bag</td>
+</tr>
+<tr>
+<td>The gene is there but the N₂O stays</td>
+<td>The gene finder found DNA rather than ability, and the write-up has
+to say so</td>
+</tr>
+<tr>
+<td>Nothing works, including the positive control</td>
+<td>The method is wrong, not the biology. Fix the vials before believing
+anything</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="what-a-lab-would-need-to-lend-us">What a lab would need to lend
+us</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>What it needs</th>
+<th>Detail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Bench space</strong></td>
+<td>An incubator shelf at 28 °C, and time on a gas chromatograph that
+reads nitrous oxide</td>
+</tr>
+<tr>
+<td><strong>Equipment</strong></td>
+<td>Anaerobic jars or a glovebag, sealed serum vials, cylinders of
+nitrous oxide and nitrogen</td>
+</tr>
+<tr>
+<td><strong>Biosafety</strong></td>
+<td><strong>BSL-1.</strong> Soil rhizobia from culture collections.
+Nothing engineered, nothing pathogenic. Waste is autoclaved</td>
+</tr>
+<tr>
+<td><strong>How long</strong></td>
+<td>About 3 weeks, with a student on site twice a week to sample</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>From us:</strong> the shortlist, the strain requests, the
+medium recipe, the blank data sheets and the analysis, all written
+already.</p>
+<h2 id="the-paperwork">The paperwork</h2>
+<p>The numbers go on 2 blank sheets, and every column on them is defined
+in <a href="../experiments/codebook.html">the codebook</a>. Only
+things read off an instrument get written down. Percentages and averages
+are worked out afterwards, so the number they came from is never
+lost.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Sheet</th>
+<th>What goes on it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a
+href="../work/experiments/data/exp-1/vials.csv"><code>vials.csv</code></a></td>
+<td>The register. Which strain is in which vial</td>
+</tr>
+<tr>
+<td><a
+href="../work/experiments/data/exp-1/headspace.csv"><code>headspace.csv</code></a></td>
+<td>Nitrous oxide and cloudiness, at each of the 5 readings</td>
+</tr>
+</tbody>
+</table></div>
+<p>The analysis was written before any data existed, and it has already
+been run on invented numbers 3 times, <strong>including runs where the
+experiment fails</strong>.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Dry run</th>
+<th>What it pretends happened</th>
+<th>What the analysis says</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a
+href="../work/experiments/results/exp-1/several-work/report.html"><code>several-work</code></a></td>
+<td>5 of the 13 clear the N₂O as fast as USDA 110</td>
+<td><strong>Yes</strong>, and it names them</td>
+</tr>
+<tr>
+<td><a
+href="../work/experiments/results/exp-1/gene-present-not-working/report.html"><code>gene-present-not-working</code></a></td>
+<td>Every shortlisted species carries the gene and the N₂O stays</td>
+<td><strong>No.</strong> The gene finder found DNA rather than
+ability</td>
+</tr>
+<tr>
+<td><a
+href="../work/experiments/results/exp-1/method-broken/report.html"><code>method-broken</code></a></td>
+<td>Even the positive control does nothing</td>
+<td><strong>No strain can be judged.</strong> Fix the vials first</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>None of these is evidence of anything.</strong> They are
+proof that the analysis tells the truth before there is any truth to
+tell.</p>
+<h2 id="why-this-is-worth-doing-even-if-it-fails">Why this is worth
+doing even if it fails</h2>
+<p><strong>Nobody has ever tested rhizobium strains for this.</strong>
+Whatever the answer is, it does not currently exist. A list of which
+soybean bacteria destroy N₂O and which do not is useful to the people
+who choose what goes in the bag, whatever happens to the rest of this
+project.</p>
+
+</main>
+<!-- The 2 lines every page ends on. Styled by assets/sitebar.html, which
+     every page that uses this also carries. -->
+<footer class="sitefoot">
+<p>NitRobe &nbsp;&middot;&nbsp; A genetically engineered soil microbe designed
+to destroy nitrous oxide, a powerful greenhouse gas</p>
+<p><b>Saanvi Pagadala</b> &middot; Granite Bay, CA</p>
+</footer>
+
+<script>
+window.wireFolds = function () {
+  var folds = document.querySelectorAll("details");
+
+  // 1 fold open at a time. Opening any other one closes it, so the page
+  // never grows into a wall of text while somebody is reading it.
+  folds.forEach(function (d) {
+    d.addEventListener("toggle", function () {
+      if (!d.open) return;
+      // Closing a fold higher up the page pulls everything below it upwards,
+      // so the question somebody just clicked would jump away from the
+      // cursor. Measure where it sits, close the others, then scroll by the
+      // difference so it stays exactly where it was.
+      var head = d.querySelector("summary");
+      var before = head.getBoundingClientRect().top;
+      folds.forEach(function (o) { if (o !== d) o.open = false; });
+      var after = head.getBoundingClientRect().top;
+      if (after !== before) scrollBy(0, after - before);
+    });
+  });
+
+  // A link to a closed fold lands the reader on a 1 line summary and nothing
+  // else, so a fold the address bar points at opens itself. Runs on arrival
+  // and again on every jump, including the back button.
+  function reveal() {
+    var id = location.hash.slice(1);
+    if (!id) return;
+    var el = document.getElementById(id);
+    while (el) {
+      if (el.tagName === "DETAILS") el.open = true;
+      el = el.parentElement;
+    }
+    var t = document.getElementById(id);
+    if (t) t.scrollIntoView();
+  }
+  addEventListener("hashchange", reveal);
+  reveal();
+};
+wireFolds();
+</script>
+<!-- The fullscreen button, and the router that keeps fullscreen across links.
+     Started as a copy of outreach/build/fullscreen.html so this submission
+     travels on its own, and the router has since been rewritten: this site
+     has pages of 2 different shapes, the writing and the gene finder, so the
+     router swaps whole pages rather than 3 named parts. -->
+
+<!-- Fullscreen, the way a video player offers it: a quiet corner button that
+     gets the browser's own furniture out of the way for reading. Written by
+     script rather than sitting in the markup, because a browser that cannot
+     do it should not be offered it. Desktop only: an iPhone has no fullscreen
+     for a page, and on a tablet the button would sit under a thumb. -->
+<script>
+(function () {
+  var root = document.documentElement;
+  if (!(root.requestFullscreen || root.webkitRequestFullscreen)) return;
+  if ('ontouchstart' in window) return;
+  // Every page carries this file, so a swapped-in page runs it again. The
+  // button and its listeners are already here; nothing to do.
+  if (window.__fsButton) return;
+  window.__fsButton = true;
+
+  var EXPAND = '<path d="M3 8V3h5M17 3h5v5M22 17v5h-5M8 22H3v-5"/>';
+  var SHRINK = '<path d="M8 3v5H3M22 8h-5V3M17 22v-5h5M3 17h5v5"/>';
+
+  var btn = document.createElement('button');
+  btn.className = 'fs';
+  btn.type = 'button';
+  document.body.appendChild(btn);
+
+  function on() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+  function paint() {
+    var label = on() ? 'Leave fullscreen' : 'Read fullscreen';
+    btn.setAttribute('aria-label', label);
+    btn.title = label + '  (F)';
+    btn.innerHTML = '<svg viewBox="0 0 25 25" aria-hidden="true">' +
+                    (on() ? SHRINK : EXPAND) + '</svg>';
+  }
+  function toggle() {
+    if (on()) {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    } else {
+      (root.requestFullscreen || root.webkitRequestFullscreen).call(root);
+    }
+  }
+
+  btn.addEventListener('click', toggle);
+  document.addEventListener('fullscreenchange', paint);
+  document.addEventListener('webkitfullscreenchange', paint);
+  // The same shortcut a video player uses, but never while something is being
+  // typed into, and never on top of a browser shortcut.
+  addEventListener('keydown', function (e) {
+    if (e.key !== 'f' && e.key !== 'F') return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var t = e.target;
+    if (t && (t.isContentEditable ||
+              /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+    e.preventDefault();
+    toggle();
+  });
+  paint();
+})();
+</script>
+
+<!-- Fullscreen belongs to a document, so following an ordinary link drops out
+     of it, and the new page cannot ask to go back in: a browser only grants
+     fullscreen on a click, and a fresh document has no click behind it.
+
+     So while fullscreen is on, and only then, a click on a link to another
+     page of this site fetches that page and puts it in place of this one
+     rather than navigating. The document never changes, so fullscreen never
+     ends. Outside fullscreen nothing here runs at all and every link is an
+     ordinary link, which is what keeps this plain static HTML for anyone
+     reading it normally, and what makes the failure of any of it harmless.
+
+     What gets swapped is the whole body, not a list of named parts. The
+     writing pages and the gene finder are built by 2 different programs and
+     share no layout, and the finder is a working app: it needs its own
+     stylesheet, its own scripts and its own startup, not just its markup.
+     Swapping everything is the only thing that covers both. -->
+<script>
+(function () {
+  if (window.__fsRouter) return;            // a swapped-in page ran this again
+  window.__fsRouter = true;
+
+  // The bar across the top, under either of the names the 2 builds give it.
+  var NAV = '.sitebar, .topbar, .nav';
+  // The head is only ever asked for what styles a page and what marks it.
+  // The icon is in here because the pages sit at different depths and each
+  // one points at the mark its own way; left alone it asks for a file that
+  // is not there.
+  var SKIN = 'link[rel="stylesheet"], link[rel="icon"], style';
+  // Scripts already fetched once. The finder's model is megabytes; walking
+  // back into it should not download it a second time.
+  var fetched = {};
+  [].forEach.call(document.scripts, function (s) {
+    if (s.src) fetched[s.src] = true;
+  });
+
+  function full() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+
+  // One script from the incoming page, put into this one so it runs. An
+  // inline script is wrapped in a function so that running the same page
+  // twice does not redeclare its variables; anything a page means to share
+  // between its scripts it hangs on window, which still works.
+  function run(src, text) {
+    return new Promise(function (done) {
+      if (src) {
+        if (fetched[src]) return done();
+        fetched[src] = true;
+      }
+      var s = document.createElement('script');
+      if (src) {
+        s.src = src;
+        s.async = false;
+        s.onload = s.onerror = done;
+      } else {
+        s.textContent = '(function(){' + text + '\n})();';
+      }
+      document.body.appendChild(s);
+      if (!src) done();
+    });
+  }
+
+  function settle(hash) {
+    // The bar's height and the landing on a #section are both worked out on
+    // load; a swapped-in page has to have them worked out again.
+    var nav = document.querySelector(NAV);
+    if (nav) {
+      document.documentElement.style.setProperty(
+        '--nav-h', nav.getBoundingClientRect().height + 'px');
+    }
+    var el = hash && document.getElementById(decodeURIComponent(hash.slice(1)));
+    // Nothing animates: the stylesheet asks for no smooth scrolling, so these
+    // arrive at once rather than gliding and being interrupted.
+    if (el) el.scrollIntoView(true);
+    else scrollTo(0, 0);
+  }
+
+  // A parsed page is not attached to anything, so its hrefs resolve against
+  // the page that parsed it rather than against the page they came from.
+  // Every address out of one is worked out by hand, against where it lives.
+  function at(node, attr, url) {
+    var v = node.getAttribute(attr);
+    return v === null ? null : new URL(v, url).href;
+  }
+
+  function skin(doc, url) {
+    // What styles a page is swapped like everything else, because the finder
+    // carries its own sizes and the writing pages carry theirs. A stylesheet
+    // both pages want is left alone rather than removed and re-added, which
+    // would flash the page unstyled.
+    var want = {}, have = {};
+    [].forEach.call(doc.head.querySelectorAll(SKIN), function (n) {
+      want[n.tagName === 'LINK' ? at(n, 'href', url) : n.textContent] = n;
+    });
+    [].forEach.call(document.head.querySelectorAll(SKIN), function (n) {
+      var k = n.tagName === 'LINK' ? n.href : n.textContent;
+      if (!want[k]) return n.remove();
+      have[k] = true;
+      if (n.tagName === 'LINK') n.setAttribute('href', k);
+    });
+    Object.keys(want).forEach(function (k) {
+      if (have[k]) return;
+      var n = document.importNode(want[k], true);
+      // Written out in full. A stylesheet or an icon named the short way
+      // means a different file on a page 1 folder down, and this one is
+      // outliving the page it came from.
+      if (n.tagName === 'LINK') n.setAttribute('href', k);
+      document.head.appendChild(n);
+    });
+  }
+
+  function swap(url, push) {
+    return fetch(url.href).then(function (r) {
+      if (!r.ok) throw 0;
+      return r.text();
+    }).then(function (text) {
+      var doc = new DOMParser().parseFromString(text, 'text/html');
+      if (!doc.body) throw 0;
+      // The URL is changed first: every relative href and src in the incoming
+      // markup is resolved against it, and the pages sit at different depths.
+      if (push) history.pushState({}, '', url.href);
+      skin(doc, url);
+      document.title = doc.title;
+      document.body.className = doc.body.className;
+
+      // The scripts are held back and run afterwards, in order, against the
+      // finished markup; the rest goes in as it is. The button is this
+      // document's own and outlives the page under it.
+      var scripts = [];
+      var body = document.createDocumentFragment();
+      [].forEach.call(doc.body.childNodes, function (n) {
+        if (n.tagName === 'SCRIPT')
+          scripts.push([at(n, 'src', url), n.textContent]);
+        else body.appendChild(document.importNode(n, true));
+      });
+      var btn = document.querySelector('button.fs');
+      document.body.textContent = '';
+      document.body.appendChild(body);
+      if (btn) document.body.appendChild(btn);
+
+      return scripts.reduce(function (chain, s) {
+        return chain.then(function () { return run(s[0], s[1]); });
+      }, Promise.resolve()).then(function () { settle(url.hash); });
+    }).catch(function () {
+      location.href = url.href;              // give up quietly, navigate
+    });
+  }
+
+  addEventListener('click', function (e) {
+    if (!full() || e.defaultPrevented) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+    var a = e.target.closest && e.target.closest('a');
+    if (!a || a.target || a.hasAttribute('download')) return;
+    var url = new URL(a.href, location.href);
+    if (url.origin !== location.origin) return;
+    // Only pages. A .csv or an image is a download or a viewer, and neither
+    // is something to paste into this one.
+    if (!/\.html$/.test(url.pathname)) return;
+    // A link to the page already open. With a #section the browser just
+    // scrolls, which is fine. Without one, as on the mark in the bar, it
+    // reloads the page, and a reload is a new document: fullscreen ends.
+    // So that one is done here instead, by going back to the top.
+    if (url.pathname === location.pathname && url.search === location.search) {
+      if (url.hash) return;
+      e.preventDefault();
+      if (location.hash) history.pushState({}, '', url.href);
+      scrollTo(0, 0);
+      return;
+    }
+    e.preventDefault();
+    swap(url, true);
+  });
+
+  addEventListener('popstate', function () {
+    if (full()) swap(new URL(location.href), false);
+  });
+})();
+</script>
+
+</body></html>

@@ -1,0 +1,3 @@
+# NitRobe | 3M Young Scientist Challenge 2027 | exp-2 | Does the built strain destroy N₂O, and does it still win the race into the roots?
+# Sheet: builds.csv | blank, to be filled in by hand at the bench | every column is defined in the codebook
+strain_id,parent_strain,genes_added,method,sequence_confirmed,date_built,notes

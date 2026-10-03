@@ -1,0 +1,661 @@
+/* The outreach site. Same palette, type and rhythm as the PDFs -- the two are
+   built from the same markdown and should feel like one thing. What differs is
+   what a screen needs: a nav bar, wider measure control and tappable targets.
+
+   One palette, always, and never the system's dark theme. The same pages are
+   printed to PDF and handed to people on paper, and a reader holding both
+   should not be looking at two different documents. */
+
+:root {
+  --ink:      #1a1a1a;
+  --ink-2:    #4a4a4a;
+  --ink-3:    #6b6b6b;
+  --accent:   #b3401f;
+  --accent-2: #8a3317;
+  --gold:     #b08d3e;        /* the version line, as in the PDFs */
+  --foot:     #877060;        /* the footer line, exactly as stamped on the PDFs */
+  --foot-rule:#e6dbd4;        /* and the warm hairline above it */
+  --rule:     #e2ddd9;
+  --rule-2:   #f0ecea;
+  --bg:       #fdfcfb;
+  --bg-2:     #f7f3f1;
+  --col:      44rem;          /* wide enough that no page title wraps */
+  color-scheme: light;        /* never the system's dark theme */
+  --serif:    "Charter", "Georgia", "Times New Roman", serif;
+  --sans:     "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { font-size: 18px; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--serif); line-height: 1.62;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ---------------------------------------------------------------- the nav */
+
+.nav {
+  position: sticky; top: 0; z-index: 10;
+  /* One row: the logo block, then the tabs. The tabs are the only thing that
+     wraps, and because the row centres its items the logo stays vertically
+     centred against them whether they take one line or three. */
+  display: flex; align-items: center; gap: 0.6rem 1.6rem;
+  padding: 0.6rem clamp(1rem, 5vw, 3rem);
+  background: var(--bg); border-bottom: 1px solid var(--rule);
+}
+.nav .brand {
+  display: flex; align-items: center; gap: 0.5rem;
+  flex: none; color: var(--ink); text-decoration: none; border: 0;
+}
+.nav .brand img { width: 82px; height: 60px; }
+/* The name over the version, the way the PDFs stack them. */
+.nav .brand .wordmark { position: relative; }
+.nav .brand b {
+  font-family: var(--sans); font-size: 1.05rem; line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+.nav .brand .ver {
+  /* Pulled up into the descender space the name's line box leaves below it:
+     top:100% is the bottom of that box, not the bottom of the letters. */
+  position: absolute; top: 100%; left: 0; margin-top: -0.16rem;
+  font-family: var(--sans); font-size: 0.6rem; font-weight: 700;
+  line-height: 1; letter-spacing: 0.06em; color: var(--gold);
+}
+.nav .links { display: flex; flex-wrap: wrap; gap: 0.35rem 1.1rem; }
+.nav .links a {
+  font-family: var(--sans); font-size: 0.82rem; letter-spacing: 0.01em;
+  color: var(--ink-3); text-decoration: none; border: 0;
+  padding: 0.15rem 0; white-space: nowrap;
+}
+.nav .links a:hover { color: var(--accent); }
+/* The five versions, behind one word. */
+.nav .vers { position: relative; }
+.nav .vers summary {
+  font-family: var(--sans); font-size: 0.82rem; letter-spacing: 0.01em;
+  color: var(--ink-2); cursor: pointer; list-style: none;
+  display: flex; align-items: center; gap: 0.3rem; white-space: nowrap;
+}
+.nav .vers summary::-webkit-details-marker { display: none; }
+/* A caret drawn rather than typed, so it turns when the panel opens. */
+.nav .vers summary::after {
+  content: ""; width: 0.32rem; height: 0.32rem; margin-top: -0.18rem;
+  border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg); transition: transform .15s ease;
+}
+.nav .vers[open] summary::after { transform: rotate(-135deg); margin-top: 0.1rem; }
+.nav .vers summary:hover { color: var(--accent); }
+.nav .vers .panel {
+  position: absolute; top: calc(100% + 0.5rem); left: -0.9rem;
+  display: flex; flex-direction: column; min-width: 15rem;
+  padding: 0.35rem 0; background: var(--bg);
+  border: 1px solid var(--rule); border-radius: 3px;
+  box-shadow: 0 14px 28px -20px rgba(0, 0, 0, 0.55); z-index: 20;
+}
+.nav .vers .panel a {
+  padding: 0.4rem 0.9rem; white-space: nowrap; border: 0;
+}
+.nav .vers .panel a:hover { background: var(--bg-2); color: var(--accent); }
+.nav .links a.here {
+  color: var(--ink); font-weight: 600;
+  border-bottom: 2px solid var(--accent);
+}
+.nav .menu { display: none; }
+
+/* ------------------------------------------------------------ the version */
+
+/* Which version this is, as a pill under the name on every page. Part of the
+   mark, so it goes where the mark goes: the landing page listing every
+   version. */
+.nav .brand .wordmark {
+  display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+}
+.nav .brand b { line-height: 1; }
+.nav .vpill {
+  display: inline-flex; align-items: center; gap: 0.4rem; align-self: center;
+  padding: 0.14rem 0.6rem 0.14rem 0.14rem; border-radius: 999px;
+  background: var(--accent); color: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+  font-family: var(--sans); font-size: 0.74rem; font-weight: 600;
+  letter-spacing: 0.01em; white-space: nowrap; line-height: 1.2;
+}
+.nav .vpill b {
+  background: #fff; color: var(--accent); font-size: 0.64rem; font-weight: 800;
+  letter-spacing: 0.06em; line-height: 1; padding: 0.24rem 0.42rem;
+  border-radius: 999px;
+}
+.nav .brand:hover .vpill { background: var(--accent-2); }
+
+/* --------------------------------------------------------------- the page */
+
+/* Everything pandoc writes sits inside <main class="page">. */
+.page > h1, .page > h2, .page > h3, .page > p, .page > ul, .page > ol,
+.page > table, .page > blockquote, .page > hr, .page > div, .page > figure,
+.page > details, .page > pre {
+  max-width: var(--col); margin-left: auto; margin-right: auto;
+  padding-left: clamp(1rem, 5vw, 0rem); padding-right: clamp(1rem, 5vw, 0rem);
+}
+
+/* The print stylesheet's h1, converted: 19pt on an 11.5pt body is 1.65rem
+   here, and the rule is the heading's own bottom border rather than a
+   separate line, which is what puts it exactly 0.35em under the text. */
+h1 {
+  font-family: var(--sans); font-size: 1.65rem; line-height: 1.2;
+  font-weight: 700; letter-spacing: -0.01em; text-wrap: balance;
+  margin: 2.2rem auto 0.6em; padding-bottom: 0.35em;
+  border-bottom: 2px solid var(--accent);
+}
+h2 {
+  font-family: var(--sans); font-size: 1.32rem; font-weight: 700;
+  letter-spacing: -0.01em; color: var(--accent-2);
+  margin: 2.6rem auto 0.7rem;
+}
+/* h2 names a section, h3 names a step inside one. Both are headings, so both
+   carry the heading colour; size and weight keep them apart. */
+h3 {
+  font-family: var(--sans); font-size: 0.98rem; font-weight: 700;
+  color: var(--accent-2); margin: 1.9rem auto 0.5rem;
+}
+/* Folds carry their own little document inside: the protocol has materials,
+   steps and rules. h2/h3 are taken by the page, so h4 is the fold's heading. */
+.page > details h4 {
+  font-family: var(--sans); font-size: 0.95rem; font-weight: 700;
+  color: var(--accent-2); margin: 1.7rem auto 0.55rem;
+}
+/* A filename as a heading. The <code> inside was inheriting plain ink, so a
+   sheet's name read quieter than the headings around it. */
+h2 > code, h3 > code, .page > details h4 > code {
+  color: inherit; background: none; padding: 0; font-size: 0.94em;
+}
+h3 > code { color: var(--accent-2); }
+
+p { margin: 0 auto 0.95rem; }
+a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--rule); }
+a:hover { border-bottom-color: var(--accent); }
+/* A filename or a path inside a link still has to read as a link. The code
+   chip's background covers the underline and its colour replaces the one
+   that says "this goes somewhere". */
+a > code { background: none; padding: 0; color: inherit; }
+strong { font-weight: 700; }
+code {
+  font-family: "SF Mono", Menlo, monospace; font-size: 0.85em;
+  background: var(--bg-2); padding: 0.1em 0.35em; border-radius: 3px;
+}
+/* Inside a block, that inline padding indents the first line and reads as a
+   stray space in front of the sequence. The block draws its own box. */
+pre code { padding: 0; background: none; border-radius: 0; font-size: inherit; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2.4rem auto; }
+
+/* Bullets: one shape everywhere, matching the print. */
+ul { list-style: none; margin: 1rem auto 1.3rem; padding-left: 1.15rem; }
+ul > li { position: relative; margin-bottom: 0.75rem; }
+ul > li::before {
+  content: ""; position: absolute; left: -0.85rem; top: 0.62em;
+  width: 5px; height: 5px; border-radius: 50%; background: var(--ink);
+}
+ul ul { margin: 0.55rem 0 0.3rem; padding-left: 1.1rem; }
+ul ul > li::before {
+  background: transparent; border: 1px solid var(--ink); width: 5px; height: 5px;
+}
+/* A checklist already has a marker: the checkbox. Pandoc marks these lists
+   list-style:none, but our bullet is drawn by ::before, so it survived and
+   printed a second dot beside every box. */
+ul.task-list { padding-left: 0.1rem; }
+ul.task-list > li::before { content: none; }
+ul.task-list > li input[type="checkbox"] { margin-right: 0.45rem; }
+
+ol { margin: 1rem auto 1.3rem; padding-left: 1.4rem; }
+ol li { margin-bottom: 0.5rem; }
+
+/* A divider row inside a table: it labels the rows under it rather than
+   holding data of its own, so it takes the heading colour and loses the
+   bold weight that would make it compete with the cells. */
+.rowhead {
+  font-family: var(--sans); font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-2);
+}
+
+blockquote {
+  margin: 1.4rem auto; padding: 0.9rem 1.2rem;
+  border-left: 3px solid var(--accent); background: var(--bg-2);
+}
+blockquote p:last-child { margin-bottom: 0; }
+
+/* Tables scroll rather than pushing the page sideways. */
+/* A wide table scrolls inside its own box rather than pushing the page
+   sideways. The scrolling belongs to a wrapper the build puts around every
+   table, not to the table itself: display:block on a table stops it filling
+   the column, and splitting thead and tbody into separate tables to get that
+   back leaves their columns free to disagree -- which is exactly what a
+   header sitting over the wrong column looks like. */
+/* A thumbnail of the organism a gene came out of, in the gene tables. The
+   larger preview it opens on hover cannot live inside the cell: a table sits
+   in a box that scrolls sideways, and a box that scrolls clips anything
+   growing out of it. So the preview is placed on the page instead, by the
+   script in the footer, and only its look is set here. */
+.orgpic {
+  width: 30px; height: 30px; object-fit: cover; display: block;
+  border-radius: 3px; border: 1px solid var(--rule); background: var(--bg-2);
+}
+/* In its own column the picture needs no room around it, and the cell should
+   not stretch to a word's width. In the trace pages it sits inline in a
+   sentence instead, so it lines up with the text there. */
+td:has(> .orgpic) { padding: 0.5rem 0 0.5rem 0.4rem; width: 30px; }
+li .orgpic, p .orgpic { display: inline-block; vertical-align: -0.55em;
+                        margin-right: 0.15rem; }
+#orgpreview {
+  position: fixed; z-index: 40; pointer-events: none;
+  padding: 4px; border-radius: 5px;
+  background: var(--bg); border: 1px solid var(--rule);
+  box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.45);
+}
+#orgpreview img { display: block; width: 220px; border-radius: 3px; }
+#orgpreview b {
+  display: block; font-family: var(--sans); font-size: 0.7rem;
+  font-style: italic; color: var(--ink-2); padding: 0.3rem 0.1rem 0.1rem;
+}
+#orgpreview[hidden] { display: none; }
+
+.tablewrap { overflow-x: auto; }
+.tablewrap > table { width: 100%; margin: 1.2rem 0 1.6rem; }
+table {
+  border-collapse: collapse; width: 100%; font-family: var(--sans);
+  font-size: 0.82rem; margin: 1.2rem auto 1.6rem;
+}
+th {
+  text-align: left; font-size: 0.7rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--ink-3); font-weight: 700;
+  border-bottom: 2px solid var(--ink-2); padding: 0.5rem 0.7rem 0.4rem;
+}
+td { padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--rule-2);
+     vertical-align: top; }
+tr:last-child td { border-bottom: 1px solid var(--ink-2); }
+
+/* The byline is in the footer of every page, so the copy inline at the end of
+   a document would say it twice. It stays in the markdown because the PDFs
+   have no such footer and need it -- and the rule that introduced it goes too,
+   or the page ends on a line with nothing under it. */
+.sig, hr:has(+ .sig) { display: none; }
+
+/* ------------------------------------------------------- the front matter */
+
+.hero {
+  display: flex; gap: 1.4rem; align-items: center;
+  max-width: 40rem; margin: 0 auto;
+  padding-left: clamp(1rem, 5vw, 0rem); padding-right: clamp(1rem, 5vw, 0rem);
+}
+.hero .portrait { margin: 0; flex: none; text-align: center; }
+.hero .portrait img {
+  width: 116px; height: 116px; object-fit: cover; border-radius: 50%;
+  border: 2px solid var(--rule); display: block;
+}
+.hero .portrait figcaption {
+  font-family: "Bradley Hand", "Noteworthy", "Segoe Script", cursive;
+  font-size: 1.15rem; font-weight: 700; color: var(--accent-2);
+  margin-top: 0.35rem;
+}
+.hero > div > p { padding: 0; }
+
+.strip {
+  display: flex; gap: 1rem; max-width: 40rem; margin: 1.6rem auto 2rem;
+  padding-left: clamp(1rem, 5vw, 0rem); padding-right: clamp(1rem, 5vw, 0rem);
+}
+.strip figure { margin: 0; flex: 1; text-align: center; }
+.strip img {
+  width: 100%; height: 108px; object-fit: cover; border-radius: 4px;
+  border: 1px solid var(--rule);
+}
+.strip figcaption {
+  font-family: var(--sans); font-size: 0.68rem; line-height: 1.4;
+  color: var(--ink-3); margin-top: 0.45rem;
+}
+
+.sig {
+  text-align: right; font-family: var(--sans); font-size: 0.8rem;
+  color: var(--ink-3); letter-spacing: 0.01em;
+}
+.sig b { color: var(--ink); }
+
+/* ------------------------------------------------------------- the footer */
+
+.foot {
+  margin-top: 4rem; padding: 1.4rem clamp(1rem, 5vw, 3rem) 3rem;
+  border-top: 1px solid var(--foot-rule); text-align: center;
+}
+.foot p { font-family: var(--sans); margin: 0 auto 0.4rem; }
+.foot .line { font-size: 0.72rem; color: var(--foot); letter-spacing: 0.01em; }
+.foot .who { font-size: 0.72rem; color: var(--foot); }
+.foot .who b { color: var(--foot); font-weight: 700; }
+
+@media (max-width: 48rem) { :root { --col: 40rem; } }
+
+/* Phones, both ways up. Seven tabs wrap to four ragged rows in portrait, and
+   in landscape a phone has so little height that even two rows of them crowd
+   the page off the screen. So below this width -- wide enough to catch a
+   phone held sideways -- the tabs fold behind a button on the right. The logo
+   does not move: it stays at the left end of the same bar it is on
+   everywhere else. */
+@media (max-width: 56rem) {
+  .nav { flex-wrap: nowrap; padding: 0.45rem clamp(1rem, 5vw, 3rem); }
+  .nav .brand img { width: 60px; height: 44px; }
+
+  /* Bigger than it looks: the bars are 18px wide, the target around them is
+     44px, which is the smallest a thumb reliably hits. */
+  .nav .menu {
+    display: flex; margin-left: auto; margin-right: -0.6rem;
+    flex-direction: column; justify-content: center; align-items: center;
+    gap: 4px; width: 44px; height: 44px; flex: none;
+    padding: 0; border: 0; background: none; cursor: pointer;
+    -webkit-appearance: none; appearance: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav .menu span {
+    display: block; width: 18px; height: 2px; border-radius: 1px;
+    background: var(--ink-2); transition: transform .18s ease, opacity .12s ease;
+    /* Safari on iOS decides whether a click propagates from the element the
+       finger actually landed on, and a bare span is not something it counts
+       as clickable. Taking the bars out of hit-testing makes the button
+       itself the target every time. */
+    pointer-events: none;
+  }
+  /* Open: the outer bars swing into a cross and the middle one goes. The 6px
+     is the bar height plus the gap, so each one reaches the centre first. */
+  .nav .menu[aria-expanded="true"] span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+  .nav .menu[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+  .nav .menu[aria-expanded="true"] span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  /* The panel overlays the page rather than pushing it down, so opening the
+     menu never moves the text the reader was looking at. */
+  .nav .links { display: none; }
+  .nav.open .links {
+    display: flex; position: absolute; top: 100%; left: 0; right: 0;
+    /* nowrap, or a capped height turns the column into ragged columns. */
+    flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 0;
+    padding: 0.3rem 0 0.6rem;
+    background: var(--bg); border-bottom: 1px solid var(--rule);
+    box-shadow: 0 12px 24px -18px rgba(0, 0, 0, 0.5);
+    /* Sideways there is room for about four rows, so the rest scroll. */
+    max-height: calc(100vh - var(--nav-h, 4rem)); overflow-y: auto;
+  }
+  .nav .links a {
+    font-size: 0.95rem; padding: 0.6rem clamp(1rem, 5vw, 3rem);
+    white-space: normal;
+  }
+  /* In the drawer there is a column to spare, so the versions are simply
+     listed rather than hidden behind another thing to open. */
+  .nav .vers .panel {
+    position: static; display: flex; min-width: 0; padding: 0;
+    border: 0; border-radius: 0; box-shadow: none; background: none;
+  }
+  .nav .vers summary { display: none; }
+  .nav .vers .panel a { padding: 0.6rem clamp(1rem, 5vw, 3rem); white-space: normal; }
+  /* The underline marking the current tab would run the whole width of a row
+     here, so it becomes a rule down the left edge instead. */
+  .nav .links a.here {
+    border-bottom: 0; box-shadow: inset 3px 0 0 var(--accent);
+  }
+}
+
+/* Portrait. The title is set for a wide measure and would take four lines. */
+@media (max-width: 40rem) {
+  h1 { margin-top: 1.5rem; font-size: 1.55rem; line-height: 1.2; }
+  .nav .brand img { width: 52px; height: 38px; }
+  .nav .brand b { font-size: 0.98rem; }
+  /* The pill carries a version name as long as "Earth microbes at work", and
+     the bar here is one row that cannot wrap. So it gives up size before it
+     gives up the menu button's 44px of thumb. */
+  .nav .brand { min-width: 0; }
+  .nav .brand .wordmark { min-width: 0; max-width: 100%; }
+  .nav .vpill {
+    font-size: 0.66rem; gap: 0.3rem;
+    padding: 0.12rem 0.5rem 0.12rem 0.12rem; max-width: 100%;
+  }
+  .nav .vpill b { font-size: 0.57rem; padding: 0.2rem 0.34rem; }
+}
+
+@media (max-width: 34rem) {
+  html { font-size: 17px; }
+  /* Narrowest phones. The mark gives up a little more size so the pill keeps
+     its whole version name and the menu button keeps its 44px of thumb. */
+  .nav .brand img { width: 44px; height: 32px; }
+  .nav .vpill { font-size: 0.62rem; }
+  .hero { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .strip { flex-direction: column; }
+  .strip img { height: 150px; }
+  table { font-size: 0.78rem; }
+}
+
+/* ------------------------------------------------- landing on a #section */
+
+/* Arriving from a link like /review.html#the-problem, the reader has to see
+   the section title -- otherwise they land mid-sentence with no idea where
+   they are. Two things get in the way: the nav bar is sticky, so it covers
+   whatever the browser scrolls to the top; and for a GitHub-style anchor the
+   thing scrolled to is the empty alias span sitting just above the heading.
+   A scroll margin the height of the nav plus a comfortable gap puts the
+   heading clear of the bar in both cases. */
+:root { --nav-h: 3.4rem; }
+h1, h2, h3, h4, .alias { scroll-margin-top: calc(var(--nav-h) + 1.4rem); }
+.alias { display: block; height: 0; }
+
+/* No smooth scrolling. Gliding to a section is a nicety; the cost of it is
+   that every programmatic scroll becomes an animation that can be dropped or
+   interrupted, and on a phone that showed up as the page opening below its
+   own nav bar with the title cut in half. A jump always arrives. */
+/* Scroll anchoring keeps the content under the reader still while something
+   above it loads. At the very top of a page that works against us: the nav
+   and the title grow as the webfont arrives, and holding the text still
+   leaves the page scrolled past its own header. */
+html { overflow-anchor: none; }
+
+/* Reopening a tab, iOS gives the page the whole screen and then draws its
+   address bar over the top of it, hiding the first hundred points or so.
+   Script spots that and sets this class; the page steps its content down far
+   enough to clear the bar. Roughly 44pt of toolbar below the status bar or
+   the notch, which is what the inset measures. */
+html.bars-over body {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 56px);
+  /* Stepping the content down must not make the page taller, or it gains
+     exactly that much empty scroll under the footer: the reader reaches the
+     end of the writing and can still keep going, through a hundred points of
+     nothing. Take the same amount back off the bottom, so the document is the
+     height it always was and only its contents have moved. */
+  margin-bottom: calc(-1 * (env(safe-area-inset-top, 0px) + 56px));
+}
+
+/* And the heading they landed on says so for a moment, then lets go. */
+@keyframes land {
+  from { background: var(--bg-2); box-shadow: -0.5rem 0 0 var(--bg-2),
+                                               0.5rem 0 0 var(--bg-2); }
+  to   { background: transparent; box-shadow: none; }
+}
+h1:target, h2:target, h3:target, .alias:target + h1,
+.alias:target + h2, .alias:target + h3 { animation: land 2.4s ease-out 1; }
+@media (prefers-reduced-motion: reduce) {
+  h1:target, h2:target, h3:target, .alias:target + h1,
+  .alias:target + h2, .alias:target + h3 { animation: none; }
+}
+
+/* --------------------------------------------------------------- figures */
+
+/* The diagrams. Natural size where there is room and no larger, so a figure
+   drawn at 960 is never blown up to fill a wider column; below that it simply
+   shrinks. A wide figure is allowed past the text measure, because a cassette
+   drawn to scale stops being readable at 44rem. */
+.fig { margin: 2rem auto; }
+.fig img { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+/* Centred under a centred drawing, and held to the text measure so a long
+   caption still reads as a sentence rather than as a wide banner. */
+.fig figcaption {
+  margin: 0.6rem auto 0; max-width: 40rem; text-align: center;
+  font-family: var(--sans); font-size: 0.78rem;
+  line-height: 1.5; color: var(--ink-3);
+}
+.page > figure.wide { max-width: 62rem; }
+
+/* A cassette map squeezed into a phone's width would be a picture of some
+   writing rather than writing. So a wide figure scrolls sideways instead of
+   shrinking past the point of being read, which is what the tables on this
+   site already do. */
+.fig.wide { overflow-x: auto; }
+.fig.wide img { min-width: 900px; }
+/* The caption lives inside the box that scrolls, so on a narrow screen
+   centring it would centre it against the drawing's full width and push it
+   out of sight. Pinned to the left of the scrollport and sized to the
+   viewport, it stays wholly visible and centres within itself. */
+@media (max-width: 62rem) {
+  .fig.wide figcaption {
+    position: sticky; left: 0;
+    width: min(40rem, 92vw); margin-left: 0; margin-right: 0;
+  }
+}
+
+/* ------------------------------------------------- the folded gene blocks */
+
+/* The gene pages carry a protein and a DNA sequence for all 37 genes. Both
+   are unreadable walls of letters that nobody scrolls through on purpose, so
+   they stay folded: a one-line summary that says which gene and how long, and
+   the letters only if asked for. */
+.page > details {
+  margin: 0.5rem auto 1.1rem;
+  border-left: 2px solid var(--rule); padding-top: 0.1rem;
+}
+.page > details > summary {
+  cursor: pointer; list-style: none;
+  font-family: var(--sans); font-size: 0.8rem; color: var(--ink-3);
+  padding: 0.35rem 0 0.35rem 1.2rem; margin-left: -1.2rem;
+  border-radius: 0.25rem;
+}
+.page > details > summary::-webkit-details-marker { display: none; }
+/* The disclosure triangle is drawn rather than inherited, so it can turn. */
+.page > details > summary::before {
+  content: "\25B8"; display: inline-block; width: 1rem;
+  color: var(--accent); transition: transform 0.15s;
+}
+.page > details[open] > summary::before { transform: rotate(90deg); }
+.page > details > summary:hover { color: var(--accent); }
+/* A fold is an offer, not a heading: it stays quiet until asked. The bold
+   half carries no colour of its own, only the weight. */
+.page > details > summary b { color: inherit; font-weight: 600; }
+
+/* A sequence is one unbroken word thousands of letters long. Left to itself
+   it pushes the page sideways on a phone, so it wraps mid-word. */
+.page > details pre, .page > details code {
+  white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-all;
+}
+.page > details pre {
+  background: var(--bg-2); border: 1px solid var(--rule-2);
+  border-radius: 0.4rem; padding: 0.7rem 0.8rem;
+  font-size: 0.68rem; line-height: 1.45; max-height: 18rem; overflow: auto;
+}
+.page > details > p { margin: 0.6rem 0 0.3rem; font-size: 0.85rem;
+                      color: var(--ink-2); }
+/* Lists inside a fold are the same aside as the paragraphs around them, so
+   they take the same size and ink. Without this a step-by-step list sits at
+   full body size beside 0.85rem prose and reads as a different document. */
+.page > details > ol, .page > details > ul {
+  font-size: 0.85rem; color: var(--ink-2);
+}
+
+
+/* An aside in small type: a pointer to more, offered without interrupting.
+   The links carry the accent so they read as links, not as grey text. */
+small { font-size: 0.76em; color: var(--ink-3); }
+small a {
+  color: var(--accent); border-bottom-color: var(--accent);
+  /* An aside's links are small by definition, so they get vertical padding
+     to reach a thumb-sized target without changing how the line looks. */
+  padding: 0.35rem 0.1rem;
+}
+small a:hover { color: var(--accent-2); border-bottom-color: var(--accent-2); }
+.page > p > small:only-child { display: block; margin-top: -0.5rem; }
+
+
+/* A folded block whose content is a two-column table of labels and prose.
+   Left to itself the table splits 50/50, and a three-word label takes half
+   the width of the page. */
+.page > details .tablewrap table td:first-child { width: 11rem; }
+.page > details .tablewrap table { margin-top: 0.2rem; }
+
+/* ------------------------------------------------------ the reading button */
+
+/* Fullscreen, offered the way a video player does: bottom right, out of the
+   way, and quiet until the pointer finds it. It floats above the page rather
+   than sitting in the footer, so it is reachable from anywhere in a long
+   document without scrolling to the end to find it. */
+.fs {
+  position: fixed; right: 1.1rem; bottom: 1.1rem; z-index: 20;
+  width: 2.5rem; height: 2.5rem; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg); color: var(--ink-3);
+  border: 1px solid var(--rule); border-radius: 0.5rem;
+  cursor: pointer; opacity: 0.55;
+  transition: opacity 0.15s, color 0.15s, border-color 0.15s;
+}
+.fs svg {
+  width: 1.05rem; height: 1.05rem; fill: none; stroke: currentColor;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+.fs:hover { opacity: 1; color: var(--accent); border-color: var(--accent); }
+.fs:focus-visible {
+  opacity: 1; outline: 2px solid var(--accent); outline-offset: 2px;
+}
+@media print { .fs { display: none; } }
+
+/* A flag, for the one cell in a table that decides the argument around it.
+   Red, rounded, and used sparingly: a page with two of these has none. */
+.flag {
+  display: inline-block;
+  padding: 0.12em 0.55em;
+  border-radius: 999px;
+  background: #fdecea;
+  border: 1px solid #e0836f;
+  color: #a32a10;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Marks in a comparison table. Emoji shout, and a table of them is unreadable;
+   these are meant to be seen out of the corner of the eye while the words are
+   read normally. */
+.yes, .no {
+  font-size: 0.9em;
+  margin-right: 0.3em;
+  font-weight: 600;
+}
+.yes { color: #4a7c4e; }
+.no  { color: #b3401f; }
+/* A traffic light for a status cell: one round dot before the words. */
+.light {
+  display: inline-block; width: 0.8em; height: 0.8em; border-radius: 50%;
+  margin-right: 0.4em; vertical-align: -0.05em;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+.light.green { background: #4a9a55; }
+.light.amber { background: #e0a53c; }
+.light.red   { background: #c84a3a; }
+/* A light in a column of its own, rather than in front of words. The gap it
+   carries for inline use would push it off centre, and a column of dots reads
+   best lined up under the heading. */
+td > .light:only-child { margin-right: 0; }
+td:has(> .light:only-child) { text-align: center; padding-right: 0; }
+
+/* The same marks as a column of their own, big enough to read down. */
+.tick { font-size: 1.35em; margin: 0; line-height: 1; }
+
+/* A category row inside a long table. It is not data, it is a heading that
+   happens to live in the grid, so it gets the warm tint the page uses for
+   anything set apart, and a rule above it to close off the group before. */
+.page table td.catrow {
+  background: var(--bg-2);
+  border-top: 2px solid var(--rule);
+  color: var(--accent-2);
+  cursor: pointer;
+  user-select: none;
+}
+.page table td.catrow::before { content: "\25be\00a0"; font-size: 0.85em; }
+.page table tr.closed td.catrow::before { content: "\25b8\00a0"; }

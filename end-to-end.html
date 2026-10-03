@@ -1,0 +1,1328 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NitRobe, the full story</title>
+<meta name="description" content="The problem, the gene finder over 40 genomes, the simulation, the build, and where it is weakest.">
+<link rel="canonical" href="https://saanvipagadala.github.io/NitRobe/end-to-end.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NitRobe">
+<meta property="og:title" content="NitRobe, the full story">
+<meta property="og:description" content="The problem, the gene finder over 40 genomes, the simulation, the build, and where it is weakest.">
+<meta property="og:url" content="https://saanvipagadala.github.io/NitRobe/end-to-end.html">
+<meta property="og:image" content="https://saanvipagadala.github.io/NitRobe/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="NitRobe, a soil microbe engineered to destroy a greenhouse gas">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="NitRobe, the full story">
+<meta name="twitter:description" content="The problem, the gene finder over 40 genomes, the simulation, the build, and where it is weakest.">
+<meta name="twitter:image" content="https://saanvipagadala.github.io/NitRobe/og-image.png">
+<meta name="theme-color" content="#4fa46c">
+<link rel="icon" type="image/svg+xml" href="nitrobe.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="site.css">
+<style>
+  /* The bar across the top. The mark's own green at about 4% over the page:
+     enough that the bar reads as its own surface when the text scrolls under
+     it, not enough to compete with anything on the page. MarsWorm does the
+     same thing with its rust. */
+  :root { --bar: #f6f9f5; --bar-rule: #dde8dc; }
+  body { background: var(--bg); }
+  main { margin: 0; padding: 1.4rem 0 0; }
+  /* The header, in the shape the public MarsWorm pages use: sticky, the mark
+     on the left, and the page it is on underlined in the accent. The links
+     stay centred, which is where this site has always had them. */
+  h1 { margin-bottom: 1rem; }
+  h2 { margin-top: 2.2rem; font-size: 1.32rem; }
+  /* Anything a fragment can land on has to clear the sticky bar, or the
+     thing being linked to sits behind it. The vendored stylesheet does
+     this for headings; folds and figures need it too, and an h2 rule
+     here would otherwise override the vendored one. */
+  main [id], main details, main summary {
+    scroll-margin-top: calc(var(--nav-h) + 1.4rem); }
+  h3 { font-size: 1.1rem; }
+  hr { border: 0; border-top: 1px solid var(--rule); margin: 2.4rem 0 0; }
+  hr + h2 { margin-top: 1.9rem; }
+
+  /* The link that hands a line of writing off to a longer page. Set the way
+     the gene finder sets "See how it was built": the accent, no extra
+     weight, a hairline of the accent under it, and the size of a note
+     rather than of the prose around it. 0.8rem is 14.4px here, which is
+     that 14.5px. */
+  a.more { font-size: .8rem; font-weight: 400;
+           border-bottom-color: rgba(179, 64, 31, .35); }
+  a.more:hover { color: var(--ink);
+                 border-bottom-color: rgba(26, 26, 26, .4); }
+
+  .tablewrap { overflow-x: auto; }
+  .tablewrap > table { width: 100%; margin: 1.2rem 0 1.6rem; }
+  table { font-size: .88rem; }
+  th { font-family: var(--sans); font-size: .74rem; letter-spacing: .04em;
+       text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+
+  /* The caveats. Every one of these is somewhere the project admits a limit,
+     so they are set apart rather than buried in a paragraph. */
+  blockquote { border-left: 3px solid var(--accent); padding: .1rem 0 .1rem 1.1rem;
+               margin: 1.4rem 0; color: var(--ink); }
+  blockquote h3 { margin: .3rem 0; font-size: 1.28rem; color: var(--accent-2);
+                  border: 0; padding: 0; }
+
+  /* The experiments index, matching labs.html on the public site. The title
+     is a plain link, what the experiment involves sits under it in the same
+     size, and the paperwork links keep to one line so the rows line up. */
+  .labs td:first-child { white-space: nowrap; width: 1%; }
+  .labs td:last-child { white-space: nowrap; }
+  /* The paperwork links are a footnote to the row, not part of it, so they
+     are set at the size the finder uses for the same kind of link. 0.8rem is
+     14.4px here, which is that 14.5px. */
+  .labs td:last-child { font-size: .8rem; }
+  .labs td:last-child a { display: inline-block; }
+  .labs td:last-child a + a { margin-left: .7rem; }
+  .labs .ask { display: block; color: var(--ink-2); margin-top: .15rem; }
+
+  img { max-width: 100%; height: auto; background: #fff;
+        border: 1px solid var(--rule-2); border-radius: 3px; margin: 1rem 0; }
+  /* The drawings, presented the way the public MarsWorm pages present
+     theirs. They are transparent on purpose, so they take the colour of the
+     page: a white box and a border behind one shows as a pale block. */
+  .fig { margin: 2rem auto; }
+  .fig img { display: block; max-width: 100%; height: auto; margin: 0 auto;
+             background: none; border: 0; }
+  .fig figcaption { margin: .6rem auto 0; max-width: 40rem; text-align: center;
+                    font-family: var(--sans); font-size: .78rem;
+                    line-height: 1.5; color: var(--ink-3); }
+  /* A drawing squeezed into the text column is a picture of some writing
+     rather than writing. So it keeps its size and the figure scrolls
+     sideways, which is what the tables on this site already do. */
+  /* A drawing is allowed past the text measure, because an experiment
+     squeezed into 44rem stops being readable. */
+  /* Only once the window itself is narrower than the drawing does the figure
+     scroll instead of shrinking past the point of being read, which is what
+     the tables on this site already do. */
+  @media (max-width: 62rem) {
+    .fig.wide { overflow-x: auto; }
+    .fig.wide img { min-width: 900px; }
+  }
+  /* The caption lives inside the box that scrolls, so centring it on a narrow
+     screen would centre it against the drawing's full width and push it out
+     of sight. Pinned to the left of the scrollport, it stays visible. */
+  @media (max-width: 62rem) {
+    .fig.wide figcaption { position: sticky; left: 0;
+                           width: min(40rem, 92vw); margin: .6rem 0 0; }
+  }
+  small { color: var(--ink-3); }
+
+  /* The folds. site.css styles these under .page, which this site does not
+     use, so the same look is set out here: a quiet offer with a rule down its
+     left side and a triangle that turns when it opens. */
+  main > details { margin: .5rem auto 1.1rem;
+                   border-left: 2px solid var(--rule); padding-top: .1rem; }
+  main > details > summary { cursor: pointer; list-style: none;
+                             font-family: var(--sans); font-size: .92rem;
+                             font-weight: 600; color: var(--ink-2);
+                             padding: .35rem 0 .35rem 1.2rem;
+                             margin-left: -1.2rem; }
+  main > details > summary::-webkit-details-marker { display: none; }
+  main > details > summary::before { content: "▸"; display: inline-block;
+                                     width: 1rem; color: var(--accent);
+                                     transition: transform .15s; }
+  main > details[open] > summary::before { transform: rotate(90deg); }
+  main > details > summary:hover { color: var(--accent); }
+
+  /* An open fold is an answer being read, and the page around it is a list of
+     questions being scanned. So it stops looking like the list: it sits on
+     its own tint, its rule turns the accent colour, and the type comes up a
+     touch with more air between the lines. */
+  main > details[open] { background: var(--bg-2);
+                         border-left-color: var(--accent);
+                         border-radius: 0 3px 3px 0;
+                         margin-bottom: 1.6rem; padding-bottom: .4rem; }
+  main > details[open] > summary { color: var(--ink);
+                                   border-bottom: 1px solid var(--rule);
+                                   margin-bottom: .5rem; }
+  main > details[open] > *:not(summary) { font-size: 1.02rem;
+                                          line-height: 1.72; }
+  /* The padding on the fold's own children replaces what main > * gives to
+     everything else, so text inside a fold lines up with text outside it. */
+  main > details > *:not(summary) { padding-left: 1.2rem; }
+  main > details[open] > *:not(summary) { padding-right: 1.2rem; }
+  /* A call-out inside an open fold. Outside a fold it stands out by sitting
+     on a tint; inside one the fold is already tinted, so the tint would
+     vanish. It stands on the page's own background instead, which is the
+     lighter of the 2, and keeps its accent rule. */
+  main > details[open] blockquote { background: var(--bg);
+                                    border-left-width: 3px;
+                                    border-radius: 0 3px 3px 0;
+                                    padding: .55rem 1rem .55rem 1.1rem;
+                                    margin: 1.2rem 0; }
+
+  /* Last, on purpose. Main spans the window and every child is held to the
+     text measure, which is what lets a drawing sit wider than the text
+     without a scrollbar. It comes after the rules above because several of
+     them set a side margin of 0, and a rule or a quote pushed to the window
+     edge is what that looked like. */
+  main > * { max-width: var(--col); margin-left: auto; margin-right: auto;
+             padding-left: clamp(1rem, 5vw, 1.1rem);
+             padding-right: clamp(1rem, 5vw, 1.1rem); }
+  /* A plain figure keeps to the text column. Only a wide one is
+     allowed past it, which is how the public pages split them. */
+  /* The footer is 2 short lines, so it is set as 2 short lines: half the gap
+     above it, tighter padding, and the 2 lines closer together than ordinary
+     paragraphs. The fullscreen button keeps the corner it has on the public
+     pages, 1.1rem in from the edges. */
+  .foot { margin-top: 2.2rem; padding-top: .9rem; padding-bottom: .9rem; }
+  .foot p { margin-bottom: .15rem; }
+  .foot .who { margin-bottom: 0; }
+
+  main > figure { max-width: var(--col); }
+  main > figure.wide { max-width: 62rem; }
+  main > .tablewrap { max-width: var(--col); }
+  /* site.css holds the hero to 40rem, and on the public pages a
+     class-level rule widens it back to the column. Same here, or
+     the portrait sits indented from the heading above it. */
+  main > .hero { max-width: var(--col); }
+</style></head><body>
+<!-- The bar across the top of every page, and the footer under it.
+
+     This is 1 file because the site is built 2 different ways. The writing is
+     markdown run through pandoc; the gene finder is a standalone page built by
+     work/dna_model/export_browser.py and copied in whole. Those 2 used to
+     carry their own copies of the bar, and the copies drifted: different
+     widths, different text sizes, a bar that slid sideways on a page with 1
+     more link in it.
+
+     Everything here is in pixels on purpose. site.css sets html to 18px and
+     the finder runs at 16px, so the same rem value means 2 different sizes.
+     Pixels are the only units that mean the same thing on both.
+
+     build_site.py reads this file, fills in the 2 placeholders below, and
+     puts it on both kinds of page. The placeholder names are deliberately not
+     repeated in this comment: the fill-in is a plain string replace, so a
+     placeholder written here would be replaced here too, and a bar full of
+     links would end up inside an HTML comment. -->
+<style>
+.sitebar { position: sticky; top: 0; z-index: 50;
+  background: #f6f9f5; border-bottom: 1px solid #dde8dc; }
+/* The same width as the text column, and the same padding, so the mark starts
+   exactly where the writing starts. Sized by the column rather than by its own
+   contents, or the whole group shifts when a page has an extra link. */
+.sitebar .inner { display: flex; align-items: center; gap: 11px 29px;
+  width: 792px; max-width: 100%; margin: 0 auto;
+  padding: 11px clamp(18px, 5vw, 0px); }
+.sitebar .brand { display: flex; align-items: center; gap: 9px;
+  color: #1a1a1a; text-decoration: none; border: 0; }
+.sitebar .brand img { width: 82px; height: 60px; background: none; border: 0;
+  margin: 0; }
+.sitebar .brand b { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 19px; line-height: 1.15; letter-spacing: -.01em; }
+.sitebar .links { display: flex; flex-wrap: wrap; gap: 6px 20px; }
+.sitebar .links a { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 15px; letter-spacing: .01em; color: #6b6b6b;
+  text-decoration: none; border: 0; padding: 3px 0; white-space: nowrap; }
+.sitebar .links a:hover { color: #b3401f; }
+.sitebar .links .sep { color: #e2ddd9; user-select: none; }
+.sitebar .links a.tool { color: #b3401f; font-weight: 600; }
+.sitebar .links a.here { color: #1a1a1a; font-weight: 600;
+  border-bottom: 2px solid #b3401f; }
+@media (max-width: 830px) { .sitebar .brand img { width: 44px; height: 29px; } }
+
+/* The same numbers the MarsWorm site uses: 0.9rem of padding top and bottom
+   rather than 1.4 and 3, and the 2 lines close together. The old values left
+   a hand's width of nothing under the writing. */
+.sitefoot { margin-top: 40px; padding: 16px clamp(18px, 5vw, 54px);
+  border-top: 1px solid #e6dbd4; text-align: center; }
+.sitefoot p { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: 0 auto 3px; font-size: 13px; color: #877060; letter-spacing: .01em;
+  line-height: 1.4; }
+.sitefoot p:last-child { margin-bottom: 0; }
+.sitefoot b { color: #877060; font-weight: 700; }
+</style>
+<nav class="sitebar"><div class="inner">
+<a class="brand" href="index.html"><img src="nitrobe.svg" alt="">
+<span class="wordmark"><b>NitRobe</b></span></a>
+<div class="links"><a class="" href="index.html">Overview</a><a class="here" href="end-to-end.html">The full story</a><a class="" href="experiments/index.html">Experiments</a><span class="sep" aria-hidden="true">|</span><a class="tool" href="finder/index.html">Try the gene finder</a></div></div></nav>
+
+<main class="">
+<h1 id="nitrobe-the-full-story">NitRobe, the full story</h1>
+<p>The whole project in the order it was worked out: the problem, why
+nobody has solved it, the invention, what was built, and where it is
+weakest. The short version is on <a href="index.html">the
+overview</a>.</p>
+<hr />
+<h2 id="the-problem">The problem</h2>
+<p>Nitrous oxide is the third worst greenhouse gas and the biggest
+destroyer of the ozone layer. 70% of it comes out of farm soil. Only 1
+enzyme on Earth can destroy it.</p>
+<p>Every spring, farmers coat the seed of soybean and other legumes with
+bags of live bacteria. Most of those bacteria cannot make that enzyme.
+This is one of the very few places on Earth where humans choose which
+microbes live in the ground.</p>
+<p><strong>Choose wisely, and a significant amount of greenhouse gas
+emission can be cut.</strong></p>
+<hr />
+<h2 id="the-whole-idea">The whole idea</h2>
+<p>Before sowing, legume farmers coat their seed with live bacteria. The
+bacteria move into the roots, live there all season, and feed the plant
+nitrogen.</p>
+<p>A company chooses which bacteria go into each bag. It chooses the
+ones that race into the roots fastest, because a strain that loses that
+race never gets into the plant at all. <strong>Nobody has ever chosen
+for anything else.</strong></p>
+<p>Most of the fast ones cannot destroy nitrous oxide. Soybeans grown
+with a strain that cannot destroy it released <strong>18.4 times more of
+the gas</strong> than soybeans grown with a strain that can.</p>
+<p>For 13 years, scientists have taken strains that destroy the gas and
+tried to teach them to win that race. They keep losing it.</p>
+<p><strong>NitRobe goes the other way. Take the strain that already
+wins, and give it the genes it is missing.</strong> Then the bacteria
+farmers already buy would destroy the gas instead of letting it go.</p>
+<p>Everything below is the argument for that, written as questions. Open
+the ones you want.</p>
+<hr />
+<h2 id="from-fertilizer-to-greenhouse-gas-in-4-steps">From fertilizer to
+greenhouse gas, in 4 steps</h2>
+<p>Fertilizer feeds half the people alive. So how does a good thing end
+up as a greenhouse gas? Here is what happens to it in the ground.</p>
+<details id="why-nitrous-oxide-is-the-gas-nobody-names">
+<summary>Why nitrous oxide, and not carbon dioxide?</summary>
+
+<p><strong>Because 1 molecule of it traps 273 times more heat, and
+almost nobody has heard of it.</strong> Carbon dioxide and methane are
+the 2 greenhouse gases everybody knows. The 3rd goes unnamed, and per
+molecule it is the worst of the 3.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Gas</th>
+<th>Heat it traps, against carbon dioxide</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Carbon dioxide</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Methane</td>
+<td>28</td>
+</tr>
+<tr>
+<td><strong>Nitrous oxide</strong></td>
+<td><strong>273</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>Farmers put nitrogen fertilizer on their fields. Crops never take up
+all of it, and soil bacteria turn the leftovers into nitrous oxide.
+<strong>That is where 70% of the world's nitrous oxide comes
+from</strong>, and it has risen 40% since 1980.</p>
+<p>It also destroys the ozone layer, which is what shields us from the
+ultraviolet light that causes skin cancer.</p>
+<blockquote>
+<p><strong>Using less fertilizer is not an option.</strong> Less
+fertilizer means less food, and the world needs the food. So the
+question is not how to put less nitrogen into soil. The question is what
+happens to the nitrogen once it is there.</p>
+</blockquote>
+</details>
+
+<details>
+<summary>What is fertilizer, exactly?</summary>
+
+<p><strong>Nitrogen, packaged so a plant can eat it.</strong> The 2
+common kinds look like this.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Fertilizer</th>
+<th>Formula</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Urea</td>
+<td>CO(NH<sub>2</sub>)<sub>2</sub></td>
+<td>The most used nitrogen fertilizer in the world</td>
+</tr>
+<tr>
+<td>Ammonium nitrate</td>
+<td>NH<sub>4</sub>NO<sub>3</sub></td>
+<td>Ammonium and nitrate, already joined together</td>
+</tr>
+</tbody>
+</table></div>
+<p>Both break down in wet soil into the form plants actually take up
+through their roots, which is <strong>nitrate,
+NO<sub>3</sub><sup>-</sup></strong>: 1 nitrogen atom carrying 3
+oxygens.</p>
+</details>
+
+<details>
+<summary>What happens to the nitrate the crop does not eat?</summary>
+
+<p><strong>It rains, and bacteria start breathing the
+leftovers.</strong> A crop never takes up all the nitrate. The rest sits
+in the soil until water fills the spaces between the grains and pushes
+the air out.</p>
+<p>Bacteria down there still need to breathe. Breathing means passing
+electrons to something, and normally that something is oxygen,
+O<sub>2</sub>. With the oxygen gone, some bacteria switch to breathing
+the nitrate instead, <strong>stripping its oxygen atoms off 1 at a
+time.</strong></p>
+<p>That is the whole chain. Watch the oxygens disappear.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>The bacterium turns</th>
+<th>into</th>
+<th>What that means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>nitrate <strong>NO<sub>3</sub><sup>-</sup></strong></td>
+<td>nitrite <strong>NO<sub>2</sub><sup>-</sup></strong></td>
+<td>1 oxygen comes off. 2 left</td>
+</tr>
+<tr>
+<td>2</td>
+<td>nitrite <strong>NO<sub>2</sub><sup>-</sup></strong></td>
+<td>nitric oxide <strong>NO</strong></td>
+<td>Another oxygen off. 1 left</td>
+</tr>
+<tr>
+<td>3</td>
+<td>nitric oxide <strong>NO</strong></td>
+<td>nitrous oxide <strong>N<sub>2</sub>O</strong></td>
+<td>2 of them join up and share the last oxygen. <strong>This is where
+the greenhouse gas is made</strong></td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td>nitrous oxide <strong>N<sub>2</sub>O</strong></td>
+<td>nitrogen gas <strong>N<sub>2</sub></strong></td>
+<td>The last oxygen comes off. <strong>This is the only way the gas is
+ever destroyed</strong>, and what is left is 78% of the air we
+breathe</td>
+</tr>
+</tbody>
+</table></div>
+<p>Each step is run by a different enzyme, and a bacterium only performs
+the steps it has genes for.</p>
+<p>That last step is performed by an enzyme, and the gene that builds
+that enzyme is called <em><strong>nosZ</strong></em>. <strong>A
+bacterium with the <em>nosZ</em> gene can destroy nitrous oxide. A
+bacterium without the <em>nosZ</em> gene cannot.</strong></p>
+<p>Taking the final oxygen off nitrous oxide is the only way nitrous
+oxide is destroyed by anything living, anywhere on Earth. There is no
+second route. From here on, the <em>nosZ</em> gene is what this whole
+project is about.</p>
+<blockquote>
+<p><strong>The job is done by 1 family of 7 genes, not by 1
+gene.</strong> They sit side by side in the genome and are named
+<em>nosR</em>, <em>nosZ</em>, <em>nosD</em>, <em>nosF</em>,
+<em>nosY</em>, <em>nosL</em> and <em>nosX</em>. Only <em>nosZ</em>
+builds the enzyme itself. The other 6 deliver the copper it needs, put
+it in the right place and switch it on, so <em>nosZ</em> alone produces
+an enzyme that does nothing. This page calls all 7 together <strong>the
+<em>nos</em> genes</strong>.</p>
+</blockquote>
+</details>
+
+<details>
+<summary>So why does any gas escape at all?</summary>
+
+<p><strong>Because soil is a community, not 1 bacterium.</strong> 1
+bacterium can make the N<sub>2</sub>O and a neighbouring bacterium
+carrying the <em>nos</em> genes can finish it off, so no single cell
+needs all 4 steps. In most soils the gas is destroyed before it can
+escape.</p>
+<p>What decides whether a field releases the gas or absorbs it is the
+balance between the bacteria that make N<sub>2</sub>O and the bacteria
+that destroy it. That balance is set by how acid the soil is, how often
+the soil floods, how much carbon the bacteria have to eat, and which
+species happen to live there.</p>
+<p>So the gas escapes where that balance tips the wrong way. The useful
+question is where a human can tip the balance on purpose.</p>
+</details>
+
+<hr />
+<h2 id="the-bag-and-who-decides-what-goes-in-it">The bag, and who
+decides what goes in it</h2>
+<p>Nobody chooses the microbes in an acre of soil. There is 1 family of
+exceptions, and it is the legumes.</p>
+<details>
+<summary>Why does a legume farmer buy a bag of bacteria?</summary>
+
+<p><strong>Because for a legume, the bacteria are the
+fertilizer.</strong> The air above every field is 78% nitrogen gas, more
+than a crop could ever use, and no plant can touch it. The 2 nitrogen
+atoms are held together by the strongest bond in ordinary chemistry.
+That is the whole reason fertilizer factories exist: they break that
+bond with enormous heat and pressure.</p>
+<p><strong>Rhizobia break it at room temperature</strong>, and legumes
+have struck a deal with them.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Side of the deal</th>
+<th>What it gives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The plant</td>
+<td>A root nodule to live in, and sugar to eat</td>
+</tr>
+<tr>
+<td>The rhizobia</td>
+<td>Nitrogen pulled straight out of the air, all season, for free</td>
+</tr>
+</tbody>
+</table></div>
+<p>But rhizobia do not come with the seed, and each legume accepts only
+its own matching kind. Most of these crops are now grown far from where
+they evolved, so the matching bacteria never travelled with them. Plant
+soybean in a field that has never grown it and the plant makes no
+nodules, fixes no nitrogen, and goes hungry.</p>
+<p>So the farmer buys them. <strong>Somebody chooses which strain goes
+in that bag, and that is the only place in agriculture where a human
+decides which microbes go into the ground.</strong></p>
+</details>
+
+<details id="why-soybean-and-not-corn">
+<summary>Why soybean, and not corn?</summary>
+
+<p><strong>Because soybean is the biggest inoculated crop, and the only
+one where the strain in the bag decides the outcome.</strong> 4 strains
+cover more than <strong>35 million hectares</strong> in Brazil alone.
+The bacteria used on alfalfa, peas and clover mostly belong to species
+that already carry the genes. Soybean is the crop whose 2 commercial
+species fall on opposite sides of that line.</p>
+<p><strong>Corn is the bigger target and it is out of reach.</strong>
+Corn is a grass, grasses grow no nodules, so there is nowhere for
+rhizobia to live and no bag to change. Whatever turns corn's fertilizer
+into nitrous oxide is whatever that field already holds, and nobody
+chose it.</p>
+<p><strong>Soybean is not a small target either.</strong> In the maize
+and soybean rotation, the largest cropping system in North America,
+roughly <strong>40%</strong> of the nitrous oxide comes out during the
+soybean phase, which is the phase nobody fertilizes. It comes out anyway
+because the nitrogen the plant fixed for itself is stored in the
+nodules, and when those nodules rot at the end of the season the
+nitrogen-rich residue feeds the bacteria that make the gas.</p>
+<blockquote>
+<p><strong>The source and the lever are the same object.</strong> The
+nodule is where the gas comes from, and the nodule is where the
+inoculant lives.</p>
+</blockquote>
+</details>
+
+<details id="what-is-actually-in-the-bag">
+<summary>What is actually in the bag?</summary>
+
+<p><strong>2 bacteria that look almost identical, and only 1 of them
+carries the genes.</strong> Soybean inoculants use 2 closely related
+bacteria, <em>Bradyrhizobium japonicum</em> and <em>Bradyrhizobium
+diazoefficiens</em>. Until 2013 scientists counted them as a single
+species. When the 2 were finally separated it turned out that 1 of them
+carries the <em>nosZ</em> gene and the other does not, and by then both
+were already being sold by the million hectares.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Strain</th>
+<th>Where it is sold</th>
+<th>Can it destroy nitrous oxide?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>B. diazoefficiens</em> USDA 110</td>
+<td>United States, widely</td>
+<td><strong>yes</strong></td>
+</tr>
+<tr>
+<td><em>B. diazoefficiens</em> CPAC 7</td>
+<td>Brazil</td>
+<td><strong>yes</strong></td>
+</tr>
+<tr>
+<td><em>B. japonicum</em> CPAC 15</td>
+<td>Brazil, since the early 1990s</td>
+<td><strong>no</strong></td>
+</tr>
+<tr>
+<td><em>B. japonicum</em> E109</td>
+<td>Argentina, the elite strain</td>
+<td><strong>no</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Soybeans inoculated with E109 produced 18.4 times more
+nitrous oxide than soybeans inoculated with USDA 110 or CPAC 7.</strong>
+Same crop, same conditions, and the only difference is which bacterium
+came out of the bag.</p>
+</details>
+
+<details id="why-the-strain-that-cannot-destroy-the-gas-is-the-one-that-wins">
+<summary>Why is the strain that cannot destroy the gas the one that wins?</summary>
+
+<p><strong>Because winning the race into the roots and destroying the
+gas are 2 unrelated abilities, and only 1 of them is ever
+tested.</strong></p>
+<p>A field that has grown soybean before is already full of rhizobia
+left by earlier crops. A plant grows only so many nodules, and whichever
+bacteria get there first take them. A strain that loses that race never
+gets inside the plant, gives the crop no nitrogen, and the farmer has
+paid for nothing. <strong>So companies test 2 things: how much nitrogen
+a strain hands the plant, and how reliably it wins the race. Neither
+test asks whether it can destroy nitrous oxide.</strong></p>
+<p>Here is how the literature describes the 2 strains that dominate
+Brazil.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Strain</th>
+<th>What scientists praise it for</th>
+<th>Has the <em>nos</em> genes?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CPAC 15</td>
+<td><strong>outstanding in its competitiveness</strong>, meaning it
+reliably beats rivals into the roots</td>
+<td><strong>no</strong></td>
+</tr>
+<tr>
+<td>CPAC 7</td>
+<td><strong>high efficiency in fixing nitrogen</strong>, meaning it
+feeds the plant well</td>
+<td><strong>yes</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>The strain praised for winning is the one that cannot destroy
+the gas.</strong> CPAC 15 earned its place fairly, judged against tests
+that were never designed to notice this.</p>
+</details>
+
+<details>
+<summary>Does the problem go away if farmers stop buying the bag?</summary>
+
+<p><strong>No, it gets worse.</strong> Rhizobia do not disappear at
+harvest. The ones a farmer adds survive in the soil and multiply season
+after season, so the rhizobia living in a Brazilian soybean field today
+are largely descendants of strains sold into that field decades ago.</p>
+<p>Those descendants are the ones without the <em>nosZ</em> gene. So
+those fields go on releasing the gas every season, whether or not
+another bag is ever opened.</p>
+</details>
+
+<details id="why-not-just-sell-the-strain-that-already-has-the-genes">
+<summary>Why not just sell farmers a strain that already has the genes?</summary>
+
+<p><strong>In the United States that is close to what already happens,
+and it is the right answer there.</strong> USDA 110 carries the genes
+and is widely sold. A farmer buying that bag needs nothing invented.</p>
+<p><strong>It stops working where the winner is the strain without the
+genes.</strong> CPAC 15 in Brazil and E109 in Argentina dominate because
+they beat every rival into the roots. Put a gas-destroying strain in the
+bag beside them and it loses that race, so it never gets inside a plant.
+The farmer has paid for a bacterium that is not there, the crop gets no
+extra nitrogen, and the gas comes out anyway. <strong>A strain that
+cannot get into the nodule cannot do anything from outside
+it.</strong></p>
+<p><strong>The field is not empty either.</strong> Those soils are
+already full of the descendants of strains sold decades ago, and they
+are the ones without the gene. A new bag has to beat them too, every
+season, forever.</p>
+<p><strong>And the search did not hand over a replacement.</strong> Of
+the 13 species it found, the one soybean farmers actually buy is <em>B.
+diazoefficiens</em>, which is USDA 110, the strain already in the bag.
+The rest mostly live on other legumes. The list is a list of species
+that can destroy the gas, not a list of strains that can win a soybean
+root.</p>
+<p>So switching the bag works exactly where the winner already carries
+the genes. Everywhere else the winner is the problem, and the only way
+to fix a winner is to change the winner.</p>
+</details>
+
+<hr />
+<h2 id="give-the-winner-the-genes">Give the winner the genes</h2>
+<p>13 years of work has come at this problem from 1 side. NitRobe comes
+at it from the other.</p>
+<details>
+<summary>What has everyone else tried?</summary>
+
+<p><strong>5 things, and 4 of them hit the same wall.</strong> Since
+2013 people have put better strains in the bag, dug strains out of local
+soil, picked soybean varieties that accept them, hunted for faster
+species, and bred a soybean that lets nothing else in. All of it is good
+work.</p>
+<p><strong>The wall is the race into the roots.</strong> The bacteria
+already living in the field get there first, so the strain in the bag
+never gets inside enough plants to matter. The 5th attempt climbs the
+wall by locking the locals out, and the price is a genetically modified
+soybean that every country has to approve.</p>
+</details>
+
+<details>
+<summary>So what does NitRobe do differently?</summary>
+
+<blockquote>
+<p><strong>Do not make the good strain competitive.</strong><br />
+<strong>Make the competitive strain good.</strong></p>
+</blockquote>
+<p>Everyone else starts with a strain that destroys the gas and tries to
+teach it to win the race into the roots. <strong>Nobody knows how to
+engineer winning</strong>, which is why they keep failing in the same
+place.</p>
+<p><strong>So start from the winner instead.</strong> Take the strain
+that already dominates the roots and give it the set of genes it is
+missing. That half we do know how to engineer, because every gene in the
+set has already been found and copied. <strong>NitRobe never has to
+solve the hard half. It inherits a winner.</strong></p>
+</details>
+
+<details>
+<summary>Has anybody already done this?</summary>
+
+<p><strong>No.</strong> Every paper and patent I could find starts from
+the losing strain and tries to make it win.</p>
+</details>
+
+<details id="does-the-change-cost-the-winner-its-speed">
+<summary>Does adding the genes slow the winner down?</summary>
+
+<p><strong>No. It should speed it up.</strong></p>
+<p>Taking the last oxygen off nitrous oxide releases more energy than
+any other step in the chain, and more than breathing air does. The
+bacterium is not being asked to carry a burden. It is being handed a
+meal it has been walking past.</p>
+<blockquote>
+<p>This is textbook electrochemistry rather than anything measured here,
+and it is a prediction, not a result. Whether a strain given the genes
+actually grows better is <a href="experiments/exp-2.html">experiment
+2</a>.</p>
+</blockquote>
+</details>
+
+<details>
+<summary>Does a simulation agree?</summary>
+
+<p><strong>Yes. Faster in 7 of the 8 situations a bacterium meets in a
+field, and never slower.</strong></p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Where the bacterium is</th>
+<th>Growth with the genes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inside a root nodule, which is where it lives</td>
+<td><strong>57% faster</strong></td>
+</tr>
+<tr>
+<td>A flooded field, which is when the gas is made</td>
+<td><strong>25% faster</strong></td>
+</tr>
+<tr>
+<td>Well-drained soil, plenty of air</td>
+<td>no difference</td>
+</tr>
+</tbody>
+</table></div>
+<p>That last row is what convinced me the simulation was behaving. With
+plenty of air, bacteria breathe air and ignore this chain, so the genes
+do nothing. <strong>That is also exactly when the field is not making
+the gas.</strong></p>
+<p><small>All 8 situations are in <a
+href="work/metabolic/results/scenarios.csv">scenarios.csv</a>.</small></p>
+</details>
+
+<hr />
+<h2 id="what-i-built-and-what-it-found">What I built, and what it
+found</h2>
+<p>Everything above says the strain in the bag is the wrong one. So I
+went looking for a better one.</p>
+<details>
+<summary>Is there already a strain that destroys the gas?</summary>
+
+<p><strong>Nobody knows, because nobody has ever checked.</strong>
+Thousands of rhizobium strains sit in university collections and company
+freezers. Every one was screened for feeding the plant and for winning
+the race into the roots. <strong>None was ever screened for destroying
+nitrous oxide</strong>, because nobody thought to ask.</p>
+</details>
+
+<details>
+<summary>Why not just look it up in a database?</summary>
+
+<p><strong>Because the labels are wrong.</strong> The obvious way is to
+look each strain up in a gene database, and that does not work. The same
+gene is filed under different names in different genomes depending on
+who typed the entry, so a search for the name misses the gene. I tried
+it on 9 commercial strains and it got one of them flatly wrong.</p>
+<p>The other way is to test strains on a bench, one at a time, which
+nobody is going to do thousands of times on a hunch.</p>
+</details>
+
+<details>
+<summary>How does the search work?</summary>
+
+<p><strong>I built a model that reads a bacterium's DNA and finds the
+gene in it</strong>, without ever reading the name somebody filed that
+gene under.</p>
+<p>I showed it 3,994 real copies of <em>nosZ</em>, pulled from the
+European Nucleotide Archive, and 11,781 things that are not it,
+including <em>nirK</em>, the gene that makes the gas one step earlier.
+From those it worked out which short runs of letters tell the two apart,
+and it now scores any piece of DNA from 0 to 1.</p>
+<p>Scoring a short piece is not the same as finding a gene in a genome
+of 9 million letters. So it walks the whole genome 2,000 letters at a
+time, both directions, scoring every step. The highest-scoring spot is
+where the gene is.</p>
+<blockquote>
+<p><strong>Run it yourself.</strong> <a href="finder/index.html">The
+gene finder</a> does exactly this in your own browser, on a real genome,
+while you watch. <a href="finder/how.html">How the model was trained</a>
+opens the lid on it.</p>
+</blockquote>
+<p><strong>Why learn it rather than look for a match.</strong> The same
+gene is spelled differently in every species, so an exact search only
+ever finds the bacterium you copied the gene from. Learning from
+thousands of spellings means a copy that has drifted is still
+recognised.</p>
+<p><strong>Then I checked it where the answer was already
+known.</strong> <em>B. diazoefficiens</em> USDA 110 is the strain the
+gene was first described in, and its position in that genome is written
+down. The search was never told where to look, and it put the gene at
+327,000 against an entry that says 326,883. <strong>It landed on
+it.</strong> A model that is confident and in the wrong place is wrong,
+so this check matters more than any score.</p>
+<p><strong>Then against the strains farmers can actually buy</strong>,
+where microbiology already knew the answer and the model was shown none
+of it.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Strain</th>
+<th>What it is</th>
+<th>The search said</th>
+<th>Literature says</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>B. diazoefficiens</em> USDA 110</td>
+<td>US commercial inoculant</td>
+<td><strong>has it</strong>, 0.99</td>
+<td>has it ✓</td>
+</tr>
+<tr>
+<td><em>B. japonicum</em> SEMIA 5079, better known as <strong>CPAC
+15</strong></td>
+<td>Brazilian commercial inoculant, 30 years, millions of hectares</td>
+<td><strong>lacks it</strong>, 0.29</td>
+<td>lacks it ✓</td>
+</tr>
+<tr>
+<td><em>B. elkanii</em></td>
+<td>common in soybean soils</td>
+<td><strong>lacks it</strong>, 0.32</td>
+<td>lacks it ✓</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>3 out of 3.</strong> The search independently reached the
+same answer as 30 years of microbiology, including on the strain
+Brazilian farmers actually buy. CPAC 15 is the one that matters: it has
+been sold across millions of hectares and it is the strain that cannot
+destroy the gas. Had the model said otherwise, this project would be
+built on sand.</p>
+</details>
+
+<details>
+<summary>What did it find?</summary>
+
+<p><strong>13 species out of 40 carry the gene, and 10 of those are
+new.</strong> The search read 40 whole genomes of
+<em>Bradyrhizobium</em>, about 330 million letters of DNA.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>What the search found</th>
+<th>How many</th>
+<th>The list</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Species carrying the gene</td>
+<td><strong>13</strong></td>
+<td><a href="finder/index.html">run it yourself</a></td>
+</tr>
+<tr>
+<td>Species without it</td>
+<td>27</td>
+<td><a href="finder/index.html">run it yourself</a></td>
+</tr>
+<tr>
+<td>Pieces piled up, in the 13</td>
+<td>90 to 1,938</td>
+<td></td>
+</tr>
+<tr>
+<td>Pieces piled up, in the 27</td>
+<td>2 to 7</td>
+<td></td>
+</tr>
+<tr>
+<td>Anything in between</td>
+<td><strong>none</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>For each of the 13 the list gives where in the genome the gene sits,
+which direction it runs, how long the stretch is, and how alike it is to
+the gene it was found with, which runs from 72% to 100%.</p>
+<p>That gap matters. A search that was guessing would smear species
+across the middle. This one did not put a single species there.</p>
+<p><strong>Published work had identified 3 species with this gene. The
+search found 10 more.</strong></p>
+<p>And 1 of the 13 shows exactly why reading the sequence beats reading
+the label. <em>B. frederickii</em> has the gene, and the protein it
+makes is filed in the database under a different name entirely.
+<strong>A search by name would have walked straight past
+it.</strong></p>
+<blockquote>
+<p><strong>What this actually delivers.</strong> Every sequenced
+rhizobium on Earth can now be checked in an afternoon, ranked by whether
+it can destroy this gas, with no laboratory and no vial opened. <a
+href="finder/index.html">Try it on a genome</a>.</p>
+<p>The impossible job becomes a short list. 13 species are now worth
+testing on a bench, and until this ran, nobody knew which 13.</p>
+</blockquote>
+</details>
+
+<details>
+<summary>What can the gene finder not tell you?</summary>
+
+<p><strong>Whether any of those 13 wins the race into the
+roots.</strong> That is a measured behaviour and it is not written in
+DNA. Crossing the 2 lists needs bench work, and that is the first
+experiment below.</p>
+<p><strong>And not every commercial strain has a public genome.</strong>
+Company strains are often sequenced privately and never deposited, so
+the search has nothing to read for them.</p>
+<p><strong>And DNA drifts faster than the protein it codes for.</strong>
+A gene can change letters without changing the protein it makes, so a
+very distant copy can slip past a search that matches DNA letter for
+letter. That is what happened with <em>B. canariense</em>: reading
+protein says it has the gene, reading DNA says it does not. It is the
+only species out of 40 where the 2 disagree.</p>
+</details>
+
+<hr />
+<h2 id="how-to-find-out-whether-it-works">How to find out whether it
+works</h2>
+<p>2 experiments would settle it, and both need a laboratory. Each is
+written out as a run sheet on <a href="experiments/index.html">the
+experiments page</a>.</p>
+<details>
+<summary>Does anything need to be built at all?</summary>
+
+<p><strong>Maybe not, and that is the first thing to find out.</strong>
+The gene finder shortlisted 13 species. If one of those 13 destroys the
+gas and can also beat the bacteria already in the soil to the roots,
+then nothing gets engineered, nothing needs approval, and the answer is
+simply to change which strain goes in.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>Run sheet</th>
+<th>The question</th>
+<th>How long</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><a href="experiments/exp-1.html">Find the N₂O destroyer</a></td>
+<td>A gene being present is not the same as a gene working</td>
+<td>3 weeks</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>This is the first thing to run in this entire
+project.</strong> It is the cheapest, it involves no genetic
+modification at all, and it could end the engineering half before it
+starts. It is also where the gene finder is put on trial: 13 species
+were predicted from DNA alone, and the gas chromatograph either agrees
+or it does not.</p>
+</details>
+
+<details>
+<summary>And if they destroy the gas but lose the race?</summary>
+
+<p><strong>Then the strain gets built, and 1 experiment tests both
+halves of it.</strong> This is the likelier outcome. The shortlist was
+read out of DNA, not chosen for competitiveness, and the strains that do
+win the race are the ones farmers already buy, which mostly carry no
+<em>nos</em> genes.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>Run sheet</th>
+<th>The question</th>
+<th>How long</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2</td>
+<td><a href="experiments/exp-2.html">Build NitRobe</a></td>
+<td>Does the built strain destroy the gas, and does it still win the
+race into the roots?</td>
+<td>4 months</td>
+</tr>
+</tbody>
+</table></div>
+<p>The vials come first, because 1 week can end what 8 weeks of pots
+cannot. Then 40 pots of real field soil that already holds its own
+rhizobia, so the build has to compete for the roots the way it would in
+a field. That race is the claim this whole page rests on, and it is the
+only place it gets tested.</p>
+<p>Both run sheets are written out as a lab would actually run it: the
+groups, why each control is there, what gets measured, and what every
+outcome would mean, including the ones that end the project. Each also
+comes with blank sheets to write the numbers on, a codebook defining
+every column, and an analysis whose rules were fixed before any data
+existed.</p>
+<p>That analysis has already been run 6 times, on invented numbers,
+<strong>including runs where the experiment fails</strong>. Those dry
+runs are how I know the analysis says no when the answer is no: it
+correctly calls the <a
+href="work/experiments/results/exp-2/build-lost-the-race/report.html">build
+that loses the race</a> a failure of the whole idea, and it refuses to
+judge any strain at all when the <a
+href="work/experiments/results/exp-1/method-broken/report.html">method
+itself is broken</a>.</p>
+</details>
+
+<details>
+<summary>What neither experiment settles</summary>
+
+<p><strong>Nitrous oxide coming off real soil</strong>, which is the
+claim this page finally rests on. Both experiments measure bacteria, one
+in a vial and one in a nodule. Measuring the gas itself means intact
+cores out of a soybean field, fertilised and flooded on the schedule a
+real field follows, with the gas read under a sealed lid on the days
+soil actually emits. That is worth doing only once experiment 2 has
+shown there is something worth measuring.</p>
+</details>
+
+</main>
+<!-- The 2 lines every page ends on. Styled by assets/sitebar.html, which
+     every page that uses this also carries. -->
+<footer class="sitefoot">
+<p>NitRobe &nbsp;&middot;&nbsp; A genetically engineered soil microbe designed
+to destroy nitrous oxide, a powerful greenhouse gas</p>
+<p><b>Saanvi Pagadala</b> &middot; Granite Bay, CA</p>
+</footer>
+
+<script>
+window.wireFolds = function () {
+  var folds = document.querySelectorAll("details");
+
+  // 1 fold open at a time. Opening any other one closes it, so the page
+  // never grows into a wall of text while somebody is reading it.
+  folds.forEach(function (d) {
+    d.addEventListener("toggle", function () {
+      if (!d.open) return;
+      // Closing a fold higher up the page pulls everything below it upwards,
+      // so the question somebody just clicked would jump away from the
+      // cursor. Measure where it sits, close the others, then scroll by the
+      // difference so it stays exactly where it was.
+      var head = d.querySelector("summary");
+      var before = head.getBoundingClientRect().top;
+      folds.forEach(function (o) { if (o !== d) o.open = false; });
+      var after = head.getBoundingClientRect().top;
+      if (after !== before) scrollBy(0, after - before);
+    });
+  });
+
+  // A link to a closed fold lands the reader on a 1 line summary and nothing
+  // else, so a fold the address bar points at opens itself. Runs on arrival
+  // and again on every jump, including the back button.
+  function reveal() {
+    var id = location.hash.slice(1);
+    if (!id) return;
+    var el = document.getElementById(id);
+    while (el) {
+      if (el.tagName === "DETAILS") el.open = true;
+      el = el.parentElement;
+    }
+    var t = document.getElementById(id);
+    if (t) t.scrollIntoView();
+  }
+  addEventListener("hashchange", reveal);
+  reveal();
+};
+wireFolds();
+</script>
+<!-- The fullscreen button, and the router that keeps fullscreen across links.
+     Started as a copy of outreach/build/fullscreen.html so this submission
+     travels on its own, and the router has since been rewritten: this site
+     has pages of 2 different shapes, the writing and the gene finder, so the
+     router swaps whole pages rather than 3 named parts. -->
+
+<!-- Fullscreen, the way a video player offers it: a quiet corner button that
+     gets the browser's own furniture out of the way for reading. Written by
+     script rather than sitting in the markup, because a browser that cannot
+     do it should not be offered it. Desktop only: an iPhone has no fullscreen
+     for a page, and on a tablet the button would sit under a thumb. -->
+<script>
+(function () {
+  var root = document.documentElement;
+  if (!(root.requestFullscreen || root.webkitRequestFullscreen)) return;
+  if ('ontouchstart' in window) return;
+  // Every page carries this file, so a swapped-in page runs it again. The
+  // button and its listeners are already here; nothing to do.
+  if (window.__fsButton) return;
+  window.__fsButton = true;
+
+  var EXPAND = '<path d="M3 8V3h5M17 3h5v5M22 17v5h-5M8 22H3v-5"/>';
+  var SHRINK = '<path d="M8 3v5H3M22 8h-5V3M17 22v-5h5M3 17h5v5"/>';
+
+  var btn = document.createElement('button');
+  btn.className = 'fs';
+  btn.type = 'button';
+  document.body.appendChild(btn);
+
+  function on() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+  function paint() {
+    var label = on() ? 'Leave fullscreen' : 'Read fullscreen';
+    btn.setAttribute('aria-label', label);
+    btn.title = label + '  (F)';
+    btn.innerHTML = '<svg viewBox="0 0 25 25" aria-hidden="true">' +
+                    (on() ? SHRINK : EXPAND) + '</svg>';
+  }
+  function toggle() {
+    if (on()) {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    } else {
+      (root.requestFullscreen || root.webkitRequestFullscreen).call(root);
+    }
+  }
+
+  btn.addEventListener('click', toggle);
+  document.addEventListener('fullscreenchange', paint);
+  document.addEventListener('webkitfullscreenchange', paint);
+  // The same shortcut a video player uses, but never while something is being
+  // typed into, and never on top of a browser shortcut.
+  addEventListener('keydown', function (e) {
+    if (e.key !== 'f' && e.key !== 'F') return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var t = e.target;
+    if (t && (t.isContentEditable ||
+              /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+    e.preventDefault();
+    toggle();
+  });
+  paint();
+})();
+</script>
+
+<!-- Fullscreen belongs to a document, so following an ordinary link drops out
+     of it, and the new page cannot ask to go back in: a browser only grants
+     fullscreen on a click, and a fresh document has no click behind it.
+
+     So while fullscreen is on, and only then, a click on a link to another
+     page of this site fetches that page and puts it in place of this one
+     rather than navigating. The document never changes, so fullscreen never
+     ends. Outside fullscreen nothing here runs at all and every link is an
+     ordinary link, which is what keeps this plain static HTML for anyone
+     reading it normally, and what makes the failure of any of it harmless.
+
+     What gets swapped is the whole body, not a list of named parts. The
+     writing pages and the gene finder are built by 2 different programs and
+     share no layout, and the finder is a working app: it needs its own
+     stylesheet, its own scripts and its own startup, not just its markup.
+     Swapping everything is the only thing that covers both. -->
+<script>
+(function () {
+  if (window.__fsRouter) return;            // a swapped-in page ran this again
+  window.__fsRouter = true;
+
+  // The bar across the top, under either of the names the 2 builds give it.
+  var NAV = '.sitebar, .topbar, .nav';
+  // The head is only ever asked for what styles a page and what marks it.
+  // The icon is in here because the pages sit at different depths and each
+  // one points at the mark its own way; left alone it asks for a file that
+  // is not there.
+  var SKIN = 'link[rel="stylesheet"], link[rel="icon"], style';
+  // Scripts already fetched once. The finder's model is megabytes; walking
+  // back into it should not download it a second time.
+  var fetched = {};
+  [].forEach.call(document.scripts, function (s) {
+    if (s.src) fetched[s.src] = true;
+  });
+
+  function full() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+
+  // One script from the incoming page, put into this one so it runs. An
+  // inline script is wrapped in a function so that running the same page
+  // twice does not redeclare its variables; anything a page means to share
+  // between its scripts it hangs on window, which still works.
+  function run(src, text) {
+    return new Promise(function (done) {
+      if (src) {
+        if (fetched[src]) return done();
+        fetched[src] = true;
+      }
+      var s = document.createElement('script');
+      if (src) {
+        s.src = src;
+        s.async = false;
+        s.onload = s.onerror = done;
+      } else {
+        s.textContent = '(function(){' + text + '\n})();';
+      }
+      document.body.appendChild(s);
+      if (!src) done();
+    });
+  }
+
+  function settle(hash) {
+    // The bar's height and the landing on a #section are both worked out on
+    // load; a swapped-in page has to have them worked out again.
+    var nav = document.querySelector(NAV);
+    if (nav) {
+      document.documentElement.style.setProperty(
+        '--nav-h', nav.getBoundingClientRect().height + 'px');
+    }
+    var el = hash && document.getElementById(decodeURIComponent(hash.slice(1)));
+    // Nothing animates: the stylesheet asks for no smooth scrolling, so these
+    // arrive at once rather than gliding and being interrupted.
+    if (el) el.scrollIntoView(true);
+    else scrollTo(0, 0);
+  }
+
+  // A parsed page is not attached to anything, so its hrefs resolve against
+  // the page that parsed it rather than against the page they came from.
+  // Every address out of one is worked out by hand, against where it lives.
+  function at(node, attr, url) {
+    var v = node.getAttribute(attr);
+    return v === null ? null : new URL(v, url).href;
+  }
+
+  function skin(doc, url) {
+    // What styles a page is swapped like everything else, because the finder
+    // carries its own sizes and the writing pages carry theirs. A stylesheet
+    // both pages want is left alone rather than removed and re-added, which
+    // would flash the page unstyled.
+    var want = {}, have = {};
+    [].forEach.call(doc.head.querySelectorAll(SKIN), function (n) {
+      want[n.tagName === 'LINK' ? at(n, 'href', url) : n.textContent] = n;
+    });
+    [].forEach.call(document.head.querySelectorAll(SKIN), function (n) {
+      var k = n.tagName === 'LINK' ? n.href : n.textContent;
+      if (!want[k]) return n.remove();
+      have[k] = true;
+      if (n.tagName === 'LINK') n.setAttribute('href', k);
+    });
+    Object.keys(want).forEach(function (k) {
+      if (have[k]) return;
+      var n = document.importNode(want[k], true);
+      // Written out in full. A stylesheet or an icon named the short way
+      // means a different file on a page 1 folder down, and this one is
+      // outliving the page it came from.
+      if (n.tagName === 'LINK') n.setAttribute('href', k);
+      document.head.appendChild(n);
+    });
+  }
+
+  function swap(url, push) {
+    return fetch(url.href).then(function (r) {
+      if (!r.ok) throw 0;
+      return r.text();
+    }).then(function (text) {
+      var doc = new DOMParser().parseFromString(text, 'text/html');
+      if (!doc.body) throw 0;
+      // The URL is changed first: every relative href and src in the incoming
+      // markup is resolved against it, and the pages sit at different depths.
+      if (push) history.pushState({}, '', url.href);
+      skin(doc, url);
+      document.title = doc.title;
+      document.body.className = doc.body.className;
+
+      // The scripts are held back and run afterwards, in order, against the
+      // finished markup; the rest goes in as it is. The button is this
+      // document's own and outlives the page under it.
+      var scripts = [];
+      var body = document.createDocumentFragment();
+      [].forEach.call(doc.body.childNodes, function (n) {
+        if (n.tagName === 'SCRIPT')
+          scripts.push([at(n, 'src', url), n.textContent]);
+        else body.appendChild(document.importNode(n, true));
+      });
+      var btn = document.querySelector('button.fs');
+      document.body.textContent = '';
+      document.body.appendChild(body);
+      if (btn) document.body.appendChild(btn);
+
+      return scripts.reduce(function (chain, s) {
+        return chain.then(function () { return run(s[0], s[1]); });
+      }, Promise.resolve()).then(function () { settle(url.hash); });
+    }).catch(function () {
+      location.href = url.href;              // give up quietly, navigate
+    });
+  }
+
+  addEventListener('click', function (e) {
+    if (!full() || e.defaultPrevented) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+    var a = e.target.closest && e.target.closest('a');
+    if (!a || a.target || a.hasAttribute('download')) return;
+    var url = new URL(a.href, location.href);
+    if (url.origin !== location.origin) return;
+    // Only pages. A .csv or an image is a download or a viewer, and neither
+    // is something to paste into this one.
+    if (!/\.html$/.test(url.pathname)) return;
+    // A link to the page already open. With a #section the browser just
+    // scrolls, which is fine. Without one, as on the mark in the bar, it
+    // reloads the page, and a reload is a new document: fullscreen ends.
+    // So that one is done here instead, by going back to the top.
+    if (url.pathname === location.pathname && url.search === location.search) {
+      if (url.hash) return;
+      e.preventDefault();
+      if (location.hash) history.pushState({}, '', url.href);
+      scrollTo(0, 0);
+      return;
+    }
+    e.preventDefault();
+    swap(url, true);
+  });
+
+  addEventListener('popstate', function () {
+    if (full()) swap(new URL(location.href), false);
+  });
+})();
+</script>
+
+</body></html>
